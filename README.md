@@ -20,6 +20,7 @@ The demos are real wherever they can be:
 - **Creature Collector:** the catch ring ported from the shared `Catch.luau`, with the server's real checks and limits.
 - **Boba & Aloe, Boba 3D:** the add-ons' own `cats.js`, `boba.js` and CSS, and the Blender sprite sheet, running in a pretend reviewer (`media/anki/reviewer.html`) that plays Anki's bridge with one saved answer.
 - **ToothID** and **alone:** the real apps (`media/toothid`, `media/alone`). ToothID runs on Patient A's 26 teeth from 3Dentes (CC BY-NC 4.0), credited on its page and in the app.
+- **ArtificialPersona:** the pipeline in the browser. Phrase timing, the sentence buffer and the translation request are ported from the repo; the browser stands in for Whisper, GPT-3.5 and Bark, and says so. Its Source tab shows the repo's own code (GPL-3.0, in `media/artificial-persona`).
 - **Earshot:** the real app. Its bundled notes are swapped for three sample lectures (`media/earshot/index.html`), so nothing private ships.
 - **Written in Real Stars:** 2,035 stars from the site's own catalogue, and real product photos. **Ad Factory:** three real ads.
 

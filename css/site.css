@@ -635,6 +635,8 @@ body.is-intro .panel { display: none; }
   border-bottom: 4px solid var(--ink);
 }
 .ptop .key { color: var(--ink); }
+.ptop .key.is-dark { color: var(--paper); }
+.ptop .key.is-dark:hover { color: var(--ink); }
 .ptop__where { font: 400 22px/1 var(--f-sign); letter-spacing: .03em; display: flex; align-items: center; gap: 10px; }
 .ptop__where i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-style: normal; }
 .ptop__links { margin-left: auto; display: flex; gap: 8px; }

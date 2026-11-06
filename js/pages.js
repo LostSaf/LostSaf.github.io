@@ -238,7 +238,7 @@ export function projectHTML(p) {
 
     <section class="psec pnotes">
       <div>
-        <div class="psec__head"><h2>What I built</h2></div>
+        <div class="psec__head"><h2>${esc(p.builtTitle || 'What I built')}</h2></div>
         <ol class="built">${p.built.map((b) => `<li><span>${esc(b)}</span></li>`).join('')}</ol>
         ${p.credit ? `<p class="credit">${esc(p.credit)}</p>` : ''}
       </div>

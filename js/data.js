@@ -417,16 +417,26 @@ projects.push(
   {
     slug: 'artificial-persona', floor: 'lab', icon: 'wave',
     title: 'ArtificialPersona',
-    short: 'Team project: speech to text, text to speech and deepfake video for anonymous real time talk.',
-    year: '2024', role: 'Team of seven',
-    tags: ['Speech to text', 'Text to speech', 'Deepfakes', 'Python'],
+    short: 'Team project: hear you, translate you, say it in another voice, and move your face to match.',
+    year: '2023 to 2024', role: 'Team of seven',
+    tags: ['Python', 'Whisper', 'GPT-3.5', 'Bark', 'ElevenLabs', 'Wav2Lip'],
     live: 'https://github.com/david-courtis/ArtificialPersona', liveLabel: 'Code on GitHub',
     lede:
-      'A neural network pipeline that chains speech to text, text to speech and deepfake video, so someone can talk in real time online with a voice and face that are not theirs.',
-    media: [], demos: [],
-    built: ['Built with David Courtis, Ovil Miranda, Carter Moore, Zane Prance, Kanika Poonia and Faiz Farook.'],
+      'A real time pipeline for talking anonymously, or in another language. Whisper transcribes what you say, GPT-3.5 translates each finished sentence, Bark or ElevenLabs speaks it in another voice, and Wav2Lip redraws the mouth on your webcam feed so your face says the new words.',
+    builtTitle: 'What the team built',
+    media: [],
+    demos: [{ id: 'persona', title: 'The pipeline, run in your browser', note: "The phrase timing, the sentence buffer and the translation request are ported from the repo as written. The models need a GPU, so the browser stands in for them and says so: its speech recognition for Whisper, its built in translator for GPT-3.5 (Chrome has one), its voice for Bark. Wav2Lip shows the frame it would be fed. The Source tab is the repo's own code." }],
+    built: [
+      'Listening in the background in 1.2 second chunks, with noise reduction before Whisper, and a new line after 2.4 seconds of quiet.',
+      'A sentence buffer that holds words back until a sentence is finished, so the translation never gets half a thought.',
+      'Translation by GPT-3.5 between any two languages, set from the command line.',
+      'Two voices: ElevenLabs multilingual v2, and Bark running locally instead.',
+      'Audio gathered into two second chunks for the lip sync, with any excess put back on the queue.',
+      'Wav2Lip on webcam frames: face detection, a 96 pixel face crop with the lower half masked, and 16 step mel windows of the new voice.',
+      'Team: David Courtis, Ovil Miranda, Carter Moore, Zane Prance, Kanika Poonia, Faiz Farook and me.',
+    ],
     hard: [],
-    numbers: [['7', 'people'], ['3', 'models chained']],
+    numbers: [['7', 'people'], ['6', 'stages'], ['15', 'commits'], ['4', 'models chained']],
   },
 
   // ---------------------------------------------------------------- study, dental

@@ -1,0 +1,92 @@
+[
+{
+"hash": "72e2c86",
+"date": "2024-03-02",
+"author": "David",
+"msg": "Merge pull request #6 from RelativelyFine/david/develop"
+},
+{
+"hash": "801065f",
+"date": "2024-03-02",
+"author": "David Courtis",
+"msg": "feature(lipsync): add inference pipeline"
+},
+{
+"hash": "ca8c5c2",
+"date": "2024-02-21",
+"author": "David Courtis",
+"msg": "feature(tts-stt): implement llm translation"
+},
+{
+"hash": "60f7659",
+"date": "2024-02-10",
+"author": "David Courtis",
+"msg": "improvement(bark): replace elevenlab with bark"
+},
+{
+"hash": "41ba1cf",
+"date": "2024-02-07",
+"author": "moorecarter",
+"msg": "feature(tts): implement bark"
+},
+{
+"hash": "982bb01",
+"date": "2024-01-20",
+"author": "David Courtis",
+"msg": "feature!: reformat and restructure pipeline"
+},
+{
+"hash": "8ea94f4",
+"date": "2023-11-12",
+"author": "ZanePrance",
+"msg": "Update Txt_to_speech_class.py"
+},
+{
+"hash": "6a7e3a8",
+"date": "2023-11-12",
+"author": "ZanePrance",
+"msg": "Create args.txt"
+},
+{
+"hash": "4231faf",
+"date": "2023-11-12",
+"author": "ZanePrance",
+"msg": "buffer added"
+},
+{
+"hash": "512ab03",
+"date": "2023-11-09",
+"author": "ZanePrance",
+"msg": "whisper model as a class object"
+},
+{
+"hash": "8162522",
+"date": "2023-11-08",
+"author": "ZanePrance",
+"msg": "testing"
+},
+{
+"hash": "20dda2b",
+"date": "2023-11-08",
+"author": "David",
+"msg": "draft: dev env"
+},
+{
+"hash": "5ab8503",
+"date": "2023-10-29",
+"author": "David",
+"msg": "Merge pull request #4 from RelativelyFine/improvement/add-team-to-readme"
+},
+{
+"hash": "2b9021a",
+"date": "2023-10-29",
+"author": "David",
+"msg": "Update README.md"
+},
+{
+"hash": "42c51ac",
+"date": "2023-10-04",
+"author": "David",
+"msg": "Initial commit"
+}
+]
