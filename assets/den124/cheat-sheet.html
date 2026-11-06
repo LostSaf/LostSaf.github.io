@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DEN124 Microbiology Cheat Sheet</title>
+<style>
+  @page { size: A4; margin: 4mm; }
+  :root {
+    --fs: 7pt;
+    --m1: #0b4f8a; --m2: #7a1f5c; --m3: #1d6b3a;
+    --clin: #a3240f; --rule: #9aa5b1; --fill: #eef2f6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-size: var(--fs); line-height: 1.1; color: #000;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page {
+    column-count: 4; column-gap: 2.2mm; column-rule: 0.4pt solid var(--rule);
+    column-fill: auto; width: 202mm; height: 289mm; overflow: hidden;
+    break-after: page;
+  }
+  .page:last-child { break-after: auto; }
+  h1 {
+    font-size: 8.6pt; margin: 0 0 1pt; padding: 1.2pt 3pt; color: #fff; break-after: avoid;
+    letter-spacing: .2pt;
+  }
+  h1.m1 { background: var(--m1); } h1.m2 { background: var(--m2); } h1.m3 { background: var(--m3); }
+  h2 {
+    font-size: 7.6pt; margin: 2pt 0 .5pt; padding: 0 0 .3pt; break-after: avoid;
+    border-bottom: .6pt solid currentColor;
+  }
+  .s1 h2 { color: var(--m1); } .s2 h2 { color: var(--m2); } .s3 h2 { color: var(--m3); }
+  p { margin: 0 0 .6pt; }
+  b { font-weight: 700; }
+  .c { color: var(--clin); }
+  .c::before { content: "\279C\00a0"; font-weight: 700; }
+  ul { margin: 0 0 .9pt; padding-left: 7pt; }
+  li { margin: 0; }
+  table { border-collapse: collapse; width: 100%; margin: .6pt 0 1.4pt; font-size: 6.8pt; line-height: 1.12; }
+  th, td { border: .4pt solid #8c97a3; padding: .5pt 1.4pt; vertical-align: top; text-align: left; }
+  tr { break-inside: avoid; }
+  th { background: var(--fill); }
+  .s1 th { color: var(--m1); } .s2 th { color: var(--m2); } .s3 th { color: var(--m3); }
+  .box { background: var(--fill); padding: .8pt 2pt; margin: .6pt 0 1.2pt; break-inside: avoid; }
+  .nb { break-inside: avoid; }
+  i { font-style: italic; }
+  sub, sup { line-height: 0; font-size: 72%; }
+  sub { vertical-align: -0.15em; } sup { vertical-align: 0.4em; }
+</style>
+</head>
+<body>
+
+<!-- ======================= PAGE 1 : MODULE 1 ======================= -->
+<div class="page s1">
+<h1 class="m1">MODULE 1 · BACTERIOLOGY</h1>
+<p><b>Naming:</b> binomial <i>Genus species</i>. Classified by shape/arrangement + biochemical, physiological, genetic properties. Oral flora very diverse; shifts from aerobic pioneers → embedded anaerobic clusters. Names often hint at disease.</p>
+
+<h2>Cell Architecture &amp; Envelope</h2>
+<p><b>Prokaryote:</b> no nucleus/organelles; genome usually 1 un-segmented circular dsDNA in <b>nucleoid</b>; no introns, no mRNA splicing; transcription + translation simultaneous in one compartment <span class="c">rapid phenotype change under threat.</span></p>
+<p><b>Eukaryote (host):</b> double-membrane nucleus; linear chromosomes w/ introns; transcribe in nucleus → export → translate; membrane has sterols, mitochondria do ETC. <span class="c">Separation blocks bacterial DNA integrating into host transcription.</span></p>
+<p><b>Host organelle sabotage:</b> toxins punch holes in inner mito membrane → dissipate PMF, halt ATP → apoptosis · encapsulated pathogens arrest endosome maturation (lysosomal block) → replicate inside macrophages · secretion systems hijack actin → propel rods into neighbour cells. <span class="c">Early mechanical debridement stops spread through facial planes.</span></p>
+<p><b>Ribosomes:</b> bacteria <b>70S (50S+30S)</b>; human <b>80S (60S+40S)</b> → selective toxicity. <span class="c">Clindamycin/erythromycin (macrolides) bind 50S, spare 80S.</span></p>
+<p><b>Peptidoglycan (PG):</b> mechanical + osmotic protection; backbone of alternating <b>NAG–NAM</b> (unique to prokaryotes, absent in humans); parallel chains wrap PM. Short peptide tails off NAM; <b>transpeptidases (PBPs)</b> covalently cross-link (D-Ala-D-Ala) → stability during growth. <span class="c">β-lactams (penicillin, amoxicillin) competitively + permanently bind transpeptidase → no cross-link → osmotic lysis.</span></p>
+<table>
+<tr><th></th><th>Gram-positive</th><th>Gram-negative</th></tr>
+<tr><td><b>PG</b></td><td>Thick, 20–40 layers, porous, rigid; sits on 1 PM</td><td>Thin, 1–2 layers in periplasm</td></tr>
+<tr><td><b>Unique</b></td><td>Teichoic acid (threads through PG); LTA (anchored in PM)</td><td>Outer membrane w/ LPS; porins; periplasm</td></tr>
+<tr><td><b>Abx</b></td><td>No outer barrier → susceptible to narrow-spectrum penicillins (reliable empirical)</td><td>OM blocks large/water-soluble drugs → intrinsic resistance</td></tr>
+</table>
+<p><b>Teichoic/LTA:</b> negative charge; act as adhesins. <span class="c">LTA = inflammatory antigen; in pulp → macrophages → pulpitis/pain before bacteria reach pulp.</span></p>
+<p><b>Periplasm (G−):</b> fluid space between inner &amp; outer membranes; concentrates <b>β-lactamase</b> <span class="c">destroys amoxicillin before it reaches targets.</span></p>
+<p><b>Outer membrane:</b> asymmetric — inner leaflet phospholipid, outer leaflet <b>LPS</b>; hydrophobic barrier.</p>
+<p><b>LPS:</b> <b>O-antigen</b> (outermost sugar; varies by mutation → disguise from antibodies in chronic infection) – <b>core</b> polysaccharide – <b>Lipid A</b> = endotoxin; shed mainly at cell death; binds <b>TLR4</b> on macrophages <span class="c">inflammatory surge → osteoclasts → alveolar bone loss (periodontitis).</span></p>
+<p><b>Porins:</b> water-filled channels; passive diffusion of small water-soluble molecules; block large/charged. <span class="c">Narrower/fewer porins = resistance.</span></p>
+<p><b>Capsule:</b> organized water-insoluble polysaccharide/polypeptide; masks antigens; anti-phagocytic <span class="c">persists in tissue, survives transient bacteremia.</span></p>
+<p><b>Slime layer/glycocalyx:</b> loose unorganized EPS; sticks to enamel, epithelium, titanium implants, acrylic dentures; traps water (anti-desiccation). <span class="c">Antimicrobials penetrate poorly → mechanical scaling.</span></p>
+<p><b>Flagella:</b> helical <b>flagellin</b> filament; basal motor driven by proton-motive gradient; chemotaxis. Most oral strep lack flagella.</p>
+<p><b>Axial filaments (endoflagella):</b> in periplasm under outer sheath → corkscrew motility; <i>Treponema denticola</i> (anaerobic spirochete, <b>red complex</b>) <span class="c">drills through sulcus ECM → necrotizing periodontal ulceration.</span></p>
+<p><b>Fimbriae:</b> short rigid hair-like; adhesin tips bind host receptors → <b>tissue tropism</b>; initial irreversible attachment. <span class="c">Anti-plaque/anti-adhesive target.</span></p>
+<p><b>Sex pili:</b> longer, tubular, encoded by fertility (F) plasmids; hollow bridge → <b>conjugation</b>. <span class="c">Commensals pass β-lactamase genes to pathogens in plaque.</span></p>
+<p><b>Endospores:</b> dormant, dehydrated; form under starvation; cortex + keratin-like coat + <b>(Ca) dipicolinic acid</b>; survive boiling, chemicals, desiccation, radiation. Sporulation 6–8 h (asymmetric division in mother cell); germinate with water + nutrients. G+ rods <i>Bacillus</i>, <i>Clostridium</i> (<i>C. difficile</i>). <span class="c">Alcohol wipes fail; autoclave mandatory. Spores in non-vital anaerobic tissue (trauma/surgery) germinate → toxins.</span></p>
+<p><b>Inclusions:</b> non-membrane granules of carbon, phosphate (polyphosphate = high-energy P for ATP), glycogen. <span class="c">Oral strep store polysaccharide → lactic acid between meals → prolonged demineralization.</span></p>
+<p><b>Plasma membrane:</b> phospholipid bilayer, <b>no sterols</b>; selective transport; houses ETC + ATP synthase (no mitochondria). <span class="c">Chlorhexidine disrupts → leakage, lost potential, death.</span></p>
+
+<h2>Environment &amp; Growth</h2>
+<p><b>Temp:</b> mesophiles 20–45 °C (all oral pathogens, opt. 37 °C); cold ↓ membrane fluidity; heat denatures proteins/membranes. <span class="c">Fever impairs replication, ↑ neutrophil phagocytosis.</span></p>
+<p><b>Autoclave:</b> moist heat <b>121 °C, 15–30 min, 15 psi</b> kills spores. <b>Biological indicator:</b> <i>Geobacillus stearothermophilus</i> spores, <b>weekly</b> spore testing.</p>
+<p><b>pH:</b> neutrophiles 6.5–7.5; <b>aciduric</b> grow &lt; 5.0, pump protons out to stay neutral. <span class="c">Frequent sugar kills acid-sensitive commensals → <i>S. mutans</i> dominates.</span></p>
+<p><b>Osmotic:</b> hypertonic → water out → <b>plasmolysis</b> (cytoplasm shrinks from wall, no division); hypotonic → water in, rigid PG prevents lysis. <span class="c">Warm saline rinse (hypertonic) ↓ edema, limits surface bacteria.</span></p>
+
+<h2>Metabolism &amp; Oxygen Ecology</h2>
+<p><b>Catabolism</b> = exergonic breakdown → ATP; <b>anabolism</b> = endergonic synthesis; catabolism supplies carbon skeletons.</p>
+<p><b>Glycolysis (Embden-Meyerhof):</b> cytoplasm; 1 glucose (6C) → 2 pyruvate (3C) + net <b>2 ATP + 2 NADH</b>; no O<sub>2</sub>. Main energy for cariogenic bacteria.</p>
+<p><b>Fermentation:</b> regenerates NAD⁺ w/o external e⁻ acceptor. <b>Homolactic</b> → lactic acid only (<i>S. mutans</i>); <b>heterolactic</b> → lactic + ethanol + acetic acid. <span class="c">Critical pH <b>5.5</b> → hydroxyapatite dissolves.</span></p>
+<p><b>TCA (Krebs):</b> pyruvate → acetyl-CoA → GTP, NADH, FADH<sub>2</sub>, CO<sub>2</sub>. <b>ETC</b> in plasma membrane pumps H⁺ out → <b>PMF</b> → ATP synthase, up to <b>34 ATP</b>/glucose. <span class="c">Membrane-depolarizing agents halt ATP instantly.</span> Aerobic commensals win on oxygenated keratinized surfaces.</p>
+<p><b>Anaerobic respiration:</b> nitrate/sulfate acceptors; ATP: fermentation &lt; anaerobic resp. &lt; aerobic. <span class="c">Deep pockets → volatile sulfur compounds (malodor, tissue damage).</span></p>
+<p><b>O<sub>2</sub> classes:</b> obligate aerobe (<i>Mycobacterium</i>) · obligate anaerobe, killed by O<sub>2</sub>/ROS (<i>P. gingivalis</i>) · facultative (<i>Streptococcus</i>). <span class="c">Supragingival facultatives use up O<sub>2</sub> → anoxia → anaerobes colonize.</span></p>
+<p><b>ROS:</b> superoxide (O<sub>2</sub>⁻), H<sub>2</sub>O<sub>2</sub>. <b>SOD:</b> O<sub>2</sub>⁻ → O<sub>2</sub> + H<sub>2</sub>O<sub>2</sub>; <b>catalase/peroxidase:</b> H<sub>2</sub>O<sub>2</sub> → H<sub>2</sub>O + O<sub>2</sub>. <span class="c">Obligate anaerobes lack SOD + catalase → O<sub>2</sub>-releasing agents/debridement hurt them.</span></p>
+<p><b>Necrotic pulp:</b> sealed, non-vital, blood supply gone → highly reduced → proteolytic obligate anaerobes <span class="c">acute periapical abscess.</span> <b>Pocket gradient:</b> healthy sulcus = high positive redox (fluid flow); deep pocket = stagnant, reduced → anaerobic selection zone.</p>
+<p><b>Caries chain:</b> saccharolytic bacteria → glycolysis (O<sub>2</sub>-independent) → pyruvate reduced to <b>lactic acid</b> pumped into plaque → pH &lt; 5.5.</p>
+<p><b>Stephan curve:</b> glucose rinse → sharp pH drop within <b>5 min</b>; &lt; 5.5 fluid unsaturated → enamel dissolves; recovery over <b>30–40 min</b> by salivary flow + <b>bicarbonate (HCO<sub>3</sub>⁻)</b>. <span class="c">Xerostomia → prolonged acid, ↑ caries.</span></p>
+<p><b>Syntrophy:</b> <i>Veillonella</i> cannot ferment sugar; eats lactic acid → weaker propionic/acetic acids → stabilizes pH, protects enamel.</p>
+<table>
+<tr><th>Group</th><th>Role</th></tr>
+<tr><td><i>S. mutans</i>, lactobacilli</td><td>Acidogenic; glycogen granules used between meals; proton extrusion via F-type ATPase</td></tr>
+<tr><td><i>Lactobacillus</i></td><td>Aciduric, minor in healthy plaque; deep dentinal caries progression</td></tr>
+<tr><td><i>Veillonella</i></td><td>Lactate consumer → buffers pH</td></tr>
+<tr><td><i>Neisseria</i></td><td>O<sub>2</sub> scavenger in early pellicle → anoxia → <i>Fusobacterium</i>, <i>Porphyromonas</i></td></tr>
+</table>
+<p><b>Protein catabolism (deep pockets):</b> asaccharolytic/proteolytic bacteria lack sugar enzymes → use GCF &amp; blood (albumin, transferrin, hemin); secrete proteases (<b>gingipains</b>, collagenases) cleaving collagen, transferrin, IgG, sIgA → peptides imported → <b>deamination → ammonia</b> → pocket pH &gt; 7.5 (optimizes gingipains) <span class="c">bone loss; independent of dietary sugar (sugar restriction won't stop it).</span></p>
+<p><b>VSCs:</b> from sulfur amino acids → break down connective tissue; <b>main cause of halitosis.</b></p>
+<p><b>Iron:</b> pathogens need Fe³⁺ (ETC, DNA). <b>Nutritional immunity:</b> host locks iron in transferrin, ferritin, lactoferrin; bacteria secrete <b>siderophores</b>. <span class="c">Iron overload → faster fascial infections.</span></p>
+<p><b>Folate:</b> bacteria can't absorb folate, make THF from <b>PABA</b>; humans absorb dietary folate <span class="c">sulfonamides = selective.</span></p>
+
+<h2>Growth Curve</h2>
+<p><b>Binary fission:</b> <b>FtsZ</b> ring at mid-cell septum; <b>autolysins</b> break wall bonds to insert new NAG/NAM. <span class="c">β-lactams kill actively dividing cells, not dormant ones.</span></p>
+<p><b>Lag:</b> no division, make enzymes/ribosomes/ATP · <b>Log:</b> max constant rate; <b>most sensitive</b> to cell-wall Abx · <b>Stationary:</b> division = death; dormancy (↓ metabolism, thicker walls, stress genes) → ↓ β-lactam effect · <b>Death:</b> exponential lysis. <span class="c">Chronic abscess (stationary) needs drainage/debridement, not Abx alone.</span></p>
+
+<h2>Genetics, Resistance &amp; Stewardship</h2>
+<p><b>Chromosome:</b> single circular dsDNA in nucleoid. <b>Plasmids:</b> small circular, replicate independently; accessory genes (resistance, exotoxins).</p>
+<p><b>Horizontal gene transfer:</b> <b>Transformation</b> = uptake of naked DNA from lysed cells (competent oral strep) · <b>Transduction</b> = bacteriophage carries DNA · <b>Conjugation</b> = contact-dependent plasmid transfer via sex pilus; relaxosome nicks plasmid, 1 strand passes (rolling-circle), F⁻ → F⁺. <span class="c">Main route of MDR spread in plaque; viridans strep &amp; <i>E. faecalis</i> = resistance reservoirs.</span></p>
+<table>
+<tr><th>Resistance</th><th>How</th></tr>
+<tr><td>Enzymatic</td><td>β-lactamase cleaves β-lactam ring (beat w/ clavulanic acid)</td></tr>
+<tr><td>Target change</td><td>Altered PBPs; methylated 50S rRNA</td></tr>
+<tr><td>Efflux pumps</td><td>PMF/ATP-driven; drug below MIC</td></tr>
+<tr><td>↓ Permeability</td><td>Porin loss (G−); amplifies β-lactamase</td></tr>
+</table>
+<p>Pathogens often combine (β-lactamase + efflux). <b>Abx don't cause mutations — they select:</b> mutations/HGT occur at baseline; drug kills susceptible competitors → resistant strains expand.</p>
+<p><b>Stewardship:</b> systemic Abx only with <b>systemic involvement</b> (fever, malaise, diffuse facial swelling, trismus). Definitive Tx = <b>mechanical</b> (pulpectomy, I&amp;D, extraction). <span class="c">No Abx for localized irreversible pulpitis or dry socket.</span></p>
+<div class="box">
+<p><b>IE prophylaxis — high-risk only (CDA/AHA):</b> ① prosthetic valve/prosthetic valve-repair material ② previous IE ③ unrepaired cyanotic CHD, or repaired w/ residual shunt/prosthetic device ④ cardiac transplant w/ valvulopathy.<br>
+<b>Regimen:</b> <b>amoxicillin 2 g PO 30–60 min</b> pre-op; severe PCN allergy → <b>azithromycin 500 mg</b>.<br>
+<b>Procedures (yes):</b> extractions/surgical incisions; scaling, root planing, probing; subgingival retraction cord / rubber-dam clamp; periapical surgery / instrumentation beyond apex.<br>
+<b>No:</b> LA through non-infected tissue; radiographs; non-surgical restorative; placing/adjusting prostho/ortho appliances; shedding primary teeth; minor mucosal trauma. <b>Prosthetic joints: not indicated</b> (COA + CDA; infections come from surgery/skin flora).<br>
+Daily chewing/brushing cause more bacteremia than visits; macrophages clear it in 15–30 min. Viridans strep adhesins bind platelet-fibrin thrombi on damaged valves.</p>
+</div>
+<table>
+<tr><th>Drug</th><th>Mechanism · spectrum · PK · issues</th></tr>
+<tr><td><b>Amoxicillin</b> / penicillin<br>β-lactam, <b>cidal</b></td><td>Binds PBPs → no cross-link → lysis. G+ strep + some oral anaerobes; poor vs β-lactamase producers. Peak 1–2 h; good soft tissue/GCF; <b>poor bone</b>; t½ ~1 h (frequent dosing). R: β-lactamase, altered PBPs. <b>1st line</b> for spreading odontogenic infection; + <b>clavulanic acid</b> if β-lactamase failure.</td></tr>
+<tr><td><b>Clindamycin</b><br>lincosamide, <b>static</b></td><td>50S → blocks peptide bond. G+ cocci + most obligate anaerobes; inactive vs aerobic G− bacilli. Peak 45–60 min; <b>excellent bone (~40%)</b>. <b><i>C. difficile</i> colitis</b>; hepatic. R: 23S rRNA methylation (<b>erm</b>). PCN allergy / osteomyelitis; warn re diarrhea.</td></tr>
+<tr><td><b>Metronidazole</b><br>nitroimidazole prodrug, <b>cidal</b></td><td>Reduced by ferredoxin → nitro radicals break DNA. <b>Obligate anaerobes only</b> (0 vs aerobes/strep). Peak 1–2 h; good soft tissue + bone. Disulfiram-like rxn w/ alcohol; hepatic. R: ↓ nitroreduction, efflux. <b>Never alone</b> for odontogenic abscess; + amoxicillin for aggressive periodontitis / deep fascial infection.</td></tr>
+<tr><td><b>Azithromycin</b><br>macrolide, <b>static</b></td><td>Reversibly binds 50S (peptidyl transferase/translocation). Atypicals + G+; variable vs perio anaerobes. Peak 2–3 h; concentrates in phagocytes → GCF; t½ &gt; 60 h, once daily. QT prolongation; hepatic; poor in mixed abscess. R: <b>mef</b> efflux, <b>erm</b>. PCN-allergy alternative.</td></tr>
+</table>
+
+<h2>Oral Biofilms</h2>
+<p><b>Biofilm:</b> community in <b>EPS</b> (polysaccharide + enzymes + eDNA + host lipids) with water channels. Tolerates Abx up to <b>1000×</b>; matrix blocks charged antimicrobials &amp; antibodies, holds β-lactamases, metabolic cooperation, buffers environment. <span class="c">Mechanical disruption (SRP) must precede/accompany chemicals.</span></p>
+<p><b>Acquired enamel pellicle:</b> acellular salivary glycoproteins, statherins, proline-rich proteins, phosphoproteins; forms within <b>minutes</b> of cleaning; protects from attrition but provides receptors. <b>Antigen I/II</b> strep adhesins bind salivary agglutinins.</p>
+<p><b>Stages:</b> pellicle → reversible attachment (electrostatic/van der Waals) → irreversible adhesin-receptor + EPS secretion → maturation (secondary colonizers bind pioneers). <span class="c">Pellicle re-forms right after polishing → daily mechanical removal.</span></p>
+<p><b>Pioneers:</b> <i>S. mitis</i>, <i>S. oralis</i>; bind pellicle, consume O<sub>2</sub>, lower redox; don't damage enamel directly.</p>
+<p><b>Co-aggregation:</b> cell-to-cell binding of secondary colonizers. <b><i>F. nucleatum</i> = bridge</b> (early G+ strep ↔ late G− anaerobes) → succession; supplies H<sub>2</sub>S + amino acids to <i>P. gingivalis</i> (synergy). Polymicrobial disease.</p>
+<p><b>Supragingival plaque:</b> coronal, saliva, high O<sub>2</sub>, dietary carbs; strep + <i>Actinomyces</i> scaffold; <b>"corncob"</b> = cocci around central filament (<i>Corynebacterium</i>/<i>Fusobacterium</i>); glucan/fructan EPS <span class="c">blocks bicarbonate → smooth-surface caries.</span></p>
+<p><b>Subgingival plaque:</b> apical, anaerobic, GCF-fed; <b>"test-tube brush"</b> = central filaments + perpendicular motile G− rods. <b>Tooth-attached</b> layer: dense calcifying rods on cementum. <b>Epithelium-associated</b>: loose, most virulent (motile rods, spirochetes, cocci) <span class="c">invades sulcular epithelium.</span></p>
+<p><b>Calculus:</b> mineralized plaque (Ca phosphate; brushite → hydroxyapatite by heterogeneous nucleation); supra minerals from saliva, sub from GCF; inside dead, rough living surface. <span class="c">Not directly inflammatory — nidus for plaque → scale.</span></p>
+<p><b>Quorum sensing:</b> autoinducers rise with density → threshold → group gene expression (virulence, matrix). Target w/o resistance.</p>
+<p><b>Sucrose:</b> glucose + fructose. <b>GTFs</b> → insoluble <b>glucans</b> (matrix cement); <b>FTFs</b> → <b>fructans</b> (labile energy store). <span class="c">Sucrose uniquely cariogenic.</span></p>
+
+<h2>Diagnostics</h2>
+<p><b>Sampling:</b> pus aspiration (abscess), paper points (pocket). Blood agar (enriched non-selective) vs selective/differential. Anaerobes need sealed vials w/ O<sub>2</sub>-reducing agents <span class="c">O<sub>2</sub> exposure → false negatives.</span> Culture + sensitivity for refractory/spreading infection.</p>
+<p><b>PCR:</b> amplifies species-specific <b>16S rRNA</b> genes in hours; &gt; 50% oral bacteria unculturable.</p>
+<p><b>Gram stain:</b> crystal violet + iodine kept by thick PG (G+ purple); alcohol washes out thin wall (G− pink w/ safranin). <b>Darkfield</b> (oblique light, live motile spirochetes bright) · <b>phase-contrast</b> (refractive index, wet mounts) <span class="c">instant spirochete confirmation in ANUG.</span></p>
+<table>
+<tr><th>Pathogen</th><th>Profile</th></tr>
+<tr><td><i>P. gingivalis</i></td><td>G− pleomorphic rod; strict anaerobe; asaccharolytic, proteolytic (Rgp/Kgp gingipains); <b>keystone</b> → severe periodontitis, bone loss</td></tr>
+<tr><td><i>T. denticola</i></td><td>G− motile spirochete; endoflagella; suppresses PMNs; necrotizing ulcerative periodontitis</td></tr>
+<tr><td><i>F. nucleatum</i></td><td>G− spindle rod; obligate anaerobe; bridging organism</td></tr>
+<tr><td><i>Eubacterium</i></td><td>G+ pleomorphic rod; asaccharolytic, slow; refractory biofilms, persistent endo abscess</td></tr>
+</table>
+<p><b>Direct periodontal damage:</b> proteases (collagenase, hyaluronidase, gingipains) → JE migrates apically, pockets, attachment loss; leukotoxins + NH<sub>3</sub>, H<sub>2</sub>S, butyrate → PMN lysis/apoptosis. <b>Indirect:</b> LPS/LTA → CD14/TLR4 → IL-1β, TNF-α, PGE<sub>2</sub> → osteoclasts; frustrated PMNs release MMPs + ROS → collateral necrosis.</p>
+<table>
+<tr><th>Lesion</th><th>Cause · flora · pulp · Tx</th></tr>
+<tr><td>Apical periodontitis</td><td>Pulp necrosis exits apex; mixed anaerobes; <b>non-vital</b>; RCT/extraction, no Abx unless systemic</td></tr>
+<tr><td>Periodontitis abscess</td><td>Flare of existing biofilm; G− anaerobes (<i>P. gingivalis, Prevotella</i>, spirochetes); <b>vital</b>; debride, drain via pocket, irrigate</td></tr>
+<tr><td>Non-periodontitis abscess</td><td>Foreign body (popcorn hull, bristle)/root fracture; <b>vital</b>; remove object, drain</td></tr>
+<tr><td>Spreading cellulitis</td><td>Periapical infection in fascial spaces; anaerobic G− rods + viridans strep; non-vital; <b>urgent I&amp;D + RCT/extraction + Abx</b></td></tr>
+</table>
+<div class="box"><p><b>Key:</b> <span class="c">red</span> = clinical relevance · G+/G− = Gram-positive/negative · PG = peptidoglycan · PBP = penicillin-binding protein · PMF = proton-motive force · EPS = extracellular polymeric substance · GCF = gingival crevicular fluid · Abx = antibiotics · PCN = penicillin · cidal/static = bactericidal/bacteriostatic · R = resistance · I&amp;D = incision &amp; drainage · RCT = root canal therapy · SRP = scaling &amp; root planing · JE = junctional epithelium · IE = infective endocarditis · CHD = congenital heart disease.</p></div>
+</div>
+
+<!-- ======================= PAGE 2 : MODULES 2 & 3 ======================= -->
+<div class="page">
+<div class="s2">
+<h1 class="m2">MODULE 2 · PATHOGENESIS &amp; HOST DEFENSES</h1>
+<h2>Immunology Foundations</h2>
+<p><b>Innate:</b> immediate, non-specific, from birth, no memory (holding action). <b>Adaptive:</b> vertebrate-only, triggered by innate signals, memory.</p>
+<p><b>1st line:</b> intact skin/mucosa, ciliated cells, flushing; <b>lysozyme</b> (saliva, tears, GCF) cleaves PG. <span class="c">Extractions breach it.</span> <b>Humoral innate:</b> antimicrobial peptides (disrupt membranes); <b>lactoferrin/transferrin</b> (bind iron); salivary <b>peroxidase</b> (ROS). <span class="c">Xerostomia → rampant root caries within months.</span></p>
+<p><b>Complement:</b> serum cascade — <b>opsonization (C3b)</b>, leukocyte recruitment, lysis by <b>MAC</b>. <span class="c">Early-component deficiency → recurrent pyogenic infections, bacteremia.</span></p>
+<p><b>Acute inflammation:</b> redness, heat, swelling, pain, loss of function. <b>Mast cells</b> release histamine (+ heparin) → vasodilation, plasma exudate (edema) <span class="c">pressure → pulpal pain. Gingivitis protective; chronic → bone loss.</span></p>
+<p><b>PRRs</b> (e.g., TLRs) detect <b>PAMPs</b> (LPS, PG, flagellin) → pro-inflammatory signal. <span class="c">TLR polymorphisms → aggressive periodontal destruction.</span></p>
+<p><b>PMNs:</b> most abundant WBC; first responders via diapedesis. Phagocytosis: chemotaxis → adherence (opsonins) → ingestion (phagosome) → digestion (phagolysosome); degranulation, oxidative burst. <span class="c">Constant sulcus migration protects healthy gingiva.</span></p>
+<p><b>Macrophages:</b> from monocytes/tissue precursors; sustained defense, debris; <b>APCs</b> present antigen on MHC. <span class="c">Chronic activation → MMPs → collagen loss, bone loss.</span></p>
+<p><b>Cytokines:</b> pro-inflammatory <b>IL-1, TNF-α, IL-6</b> (fever, acute-phase proteins, recruitment); anti-inflammatory <b>IL-10, TGF-β</b>. <span class="c">↑ TNF-α + IL-1 → osteoclasts → alveolar bone resorption.</span></p>
+<p><b>Type I IFN (α, β):</b> from virus-infected cells → neighbours enter antiviral state. <span class="c">Holds HSV before CTLs arrive.</span></p>
+<p><b>Antibodies:</b> Fab = variable antigen-binding; Fc = constant effector.<br>
+<b>IgG</b> most abundant serum (+GCF), high affinity, crosses placenta, secondary response, opsonizes/complement · <b>IgM</b> pentamer, first responder, low affinity/high avidity, best complement activator · <b>IgA/sIgA</b> dimer in saliva/mucosa, blocks adhesion (IgA deficiency → mucosal infections, early caries) · <b>IgE</b> type I hypersensitivity, worms. <b>Affinity maturation:</b> IgM → high-affinity IgG.</p>
+<p><b>CD4⁺ T<sub>H</sub></b> ("generals"): cytokines activate B cells (class switching) + macrophages. <b>CD8⁺ CTL:</b> perforin + granzymes → apoptosis of infected cells. <b>NK:</b> innate; kill cells with ↓ MHC I ("missing self"). <span class="c">HIV kills CD4⁺ → oral candidiasis.</span></p>
+
+<h2>Multi-Kingdom Pathogenesis</h2>
+<p><b>Pathogenicity</b> = qualitative (yes/no); <b>virulence</b> = quantitative degree, via virulence factors. <b>Infection</b> (disease) vs <b>colonization</b> (no symptoms).</p>
+<p><b>Direct</b> damage = microbial enzymes/toxins/subversion. <b>Indirect</b> = host's own response (cytokines, lysosomal enzymes, prostaglandins). <span class="c">Periodontal destruction mainly indirect → host-modulating drugs help.</span></p>
+<p><b>Adhesion:</b> non-specific (van der Waals, hydrophobic) → irreversible adhesin-receptor; <b>tropism</b> = matching receptors.</p>
+<p><b>Invasins:</b> <b>hyaluronidase</b> (dissolves "cellular cement" → cellulitis spreads through fascia); <b>collagenase</b> (<i>P. gingivalis</i> destroys PDL → mobility).</p>
+<p><b>Exotoxins:</b> proteins secreted by live bacteria (tetanus, diphtheria; necrosis, toxemia). <b>Endotoxin (LPS/lipid A):</b> G− outer membrane, released at lysis, TLR4. <span class="c">LPS left in dentinal tubules → endo failure.</span></p>
+<p><b>T3SS:</b> G− "molecular syringe" injects effectors → hijack actin, collapse mito PMF (apoptosis), block phagolysosome maturation.</p>
+<p><b>Viruses:</b> spread horizontal (droplet, aerosol, contact) or vertical. <b>Latency</b> (HSV, VZV, EBV; recur from ganglia w/ stress/UV) vs <b>chronic</b> replication (HBV, HIV). <b>Integration</b> (retroviruses, oncogenic) → transformation.</p>
+<p><b>Fungi:</b> <i>Candida albicans</i>, opportunistic; <b>dimorphism</b> yeast ↔ invasive hyphae; <b>SAPs</b> (aspartyl proteinases) penetrate mucosa. <span class="c">Broad-spectrum Abx kill protective bacteria → overgrowth.</span></p>
+<p><b>Parasites:</b> protozoa (trophozoite ↔ cyst; cysts survive chlorination → filter); helminths (obstruction, malabsorption).</p>
+<p><b>Prions:</b> protein only; <b>PrP<sup>Sc</sup></b> converts PrP<sup>C</sup> α-helix → β-sheet. <span class="c">Survive 121 °C autoclave → NaOH + high-temp steam.</span></p>
+<p><b>Evasion:</b> capsule/biofilm shielding; <b>antigenic variation</b> (viruses, protozoa → yearly flu shot); <b>host mimicry</b>; intracellular sanctuary (block phagolysosome); MHC I interference; cytokine/IFN subversion <span class="c">intracellular → need cell-penetrating drugs.</span></p>
+<p><b>Persistence:</b> <i>M. leprae</i> 5–20 yr incubation; post-infectious sequelae (rheumatic fever). <b>Spread:</b> fascial planes (least resistance), bacteremia <span class="c">Ludwig angina = airway obstruction.</span></p>
+<p><b>Host risk:</b> <b>diabetes</b> (hyperglycemia ↓ PMN chemotaxis, adhesion, oxidative burst; poor collagen healing) · <b>immunosuppression</b> (cyclosporine ↓ T-cells; biologics/steroids ↓ macrophages) · <b>age/hormones</b> (immunosenescence; puberty/pregnancy/menopause → pregnancy gingivitis) · <b>genetics</b> (cytokine/complement polymorphisms → tailored recall).</p>
+<p><b>Opportunistic:</b> commensal → disease if defenses fail, flora displaced or barrier breached <span class="c">viridans strep → IE.</span> <b>Bacteriostatic</b> only halts growth → needs host immunity (fails in neutropenia).</p>
+
+<h2>Disease Causation &amp; Evidence</h2>
+<p><b>Koch (1890):</b> ① microbe in all diseased, not healthy ② isolate in pure culture ③ causes disease in healthy host ④ re-isolate identical. <b>Fails in dentistry:</b> polymicrobial; "pathogens" found at healthy sites.</p>
+<p><b>Gnotobiotic</b> = germ-free animal + 1 strain (isolates 1 species' potential; proved caries infectious + transmissible; not polymicrobial) · <b>cell culture</b> = human lines (cytokines, toxicity, epithelial breach; no animals) · <b>cross-sectional</b> = diseased vs healthy at 1 time (associations, <b>no cause/effect</b>) · <b>longitudinal</b> = same pts over time (<b>gold standard</b>; showed environment shifts precede disease; costly, needs compliance).</p>
+<table>
+<tr><th>Hypothesis</th><th>Idea → approach (verdict)</th></tr>
+<tr><td>Specific</td><td>Few species cause disease → narrow Abx (fails: polymicrobial, found in health)</td></tr>
+<tr><td>Non-specific</td><td>Total plaque mass → general scaling (fails: big plaque ≠ always destruction)</td></tr>
+<tr><td><b>Ecological</b></td><td>Environment (sugar, low O<sub>2</sub>) → dysbiosis → diet, pH, inflammation control (succeeds)</td></tr>
+<tr><td><b>Keystone</b></td><td>Low-abundance <i>P. gingivalis</i> remodels microbiome → target keystone (succeeds)</td></tr>
+</table>
+</div>
+
+<div class="s3">
+<h1 class="m3">MODULE 3 · VIROLOGY</h1>
+<h2>Architecture, Classification &amp; Replication</h2>
+<p><b>Viruses:</b> acellular; no ribosomes/ATP; <b>obligate intracellular</b>. <b>Virion</b> = complete infectious extracellular particle; DNA <i>or</i> RNA, never both. <b>Size:</b> parvovirus 20 nm → pox 300–400 nm; pass 0.22 µm filters; need EM; millions/mL saliva/blood. <span class="c">Masks capture electrostatically, not by straining → aerosols need fitted N95.</span></p>
+<p><b>Capsid</b> of <b>capsomeres</b>: <b>icosahedral</b> (20 faces, 12 vertices; adenovirus, herpes) or <b>helical</b> (influenza, rabies). Repetitive epitopes = PAMPs → strong B-cell response w/o adjuvant.</p>
+<p><b>Envelope:</b> host lipid (plasma/nuclear/ER) gained at egress + viral glycoprotein <b>spikes</b> (influenza HA, SARS-CoV-2 spike) for attachment + fusion. <span class="c">Lose envelope = inactive.</span></p>
+<table>
+<tr><th></th><th>Enveloped (fragile)</th><th>Naked (resilient)</th></tr>
+<tr><td>Killed by</td><td>Lipid solvents, 70% ethanol, detergent, drying, acid · ABHR</td><td>Resists all these → intermediate–high disinfectant; <b>soap + water</b></td></tr>
+<tr><td>Spread · exit</td><td>Contact, blood, droplets · budding</td><td>Fecal-oral, water, food, fomites · lysis</td></tr>
+<tr><td>e.g.</td><td>HIV, HBV, HCV, herpes, flu, corona</td><td>Noro, polio, coxsackie, rhino, adeno, HPV</td></tr>
+</table>
+<p><b>Baltimore:</b> every virus must make <b>(+)ss mRNA</b>; 7 groups by genome + route to mRNA. (+) RNA = mRNA; (−) must be transcribed. <span class="c">RT-PCR converts RNA → cDNA first.</span></p>
+<table>
+<tr><th>Gp</th><th>Genome · polymerase</th><th>Examples</th></tr>
+<tr><td>I</td><td>dsDNA; nucleus, host RNA pol II (<b>pox</b>: cytoplasm, own enzymes)</td><td>Herpes, HPV, adeno</td></tr>
+<tr><td>II</td><td>ssDNA → dsDNA intermediate (host pols)</td><td>Parvovirus B19</td></tr>
+<tr><td>III</td><td>dsRNA, segmented; packaged RdRP</td><td>Rotavirus</td></tr>
+<tr><td>IV</td><td>(+)ssRNA = mRNA; naked RNA infectious; RdRP made after entry</td><td>HCV, SARS-CoV-2, rhino/entero</td></tr>
+<tr><td>V</td><td>(−)ssRNA; <b>must package RdRP</b></td><td>Influenza, measles, mumps, RSV, rabies</td></tr>
+<tr><td>VI</td><td>Diploid (+)ssRNA → RT → dsDNA → integrase → provirus</td><td>HIV-1/2, HTLV-1</td></tr>
+<tr><td>VII</td><td>Partial dsDNA → cccDNA → pregenomic RNA → RT</td><td>HBV</td></tr>
+</table>
+<p>DNA pols proofread (low mutation; HSV/VZV persist as episomes → latency). <b>RdRP</b> is unique to viruses, <b>no proofreading</b> → antigenic change + drug resistance. Provirus/cccDNA = incurable reservoir → lifelong suppression.</p>
+<p><b>1 Attachment:</b> VAP ↔ receptor. Cell tropism (EBV → CD21 B cells; rabies → ACh receptor); host range narrow (smallpox, polio) vs broad (rabies, West Nile, SARS-CoV-2); coreceptors (HIV: CD4 + CCR5/CXCR4). <span class="c">SARS-CoV-2 binds ACE2 on oral epithelium + salivary ducts.</span></p>
+<p><b>2–3 Penetration/uncoating:</b> direct fusion at neutral pH (HIV, herpes); receptor-mediated (clathrin) endocytosis + endosome acidification (influenza); pore/injection by naked viruses (polio); uncoating exposes genome (entry/fusion inhibitors act here).</p>
+<p><b>4 Synthesis:</b> <b>early</b> = enzymes, regulators, evasion proteins → genome replication → <b>late</b> = structural proteins; host shutoff. Antivirals hit early enzymes.</p>
+<p><b>5–6 Assembly/egress:</b> spontaneous; naked → lysis; enveloped → bud (PM or trans-Golgi); <b>protease maturation</b> (HIV, HCV) → target of PIs.</p>
+<p><b>One-step growth:</b> <b>eclipse</b> (uncoating → first intracellular infectious virion; none detectable) · <b>latent</b> (infection → extracellular release) · <b>burst</b>, 100 → &gt;10,000 virions/cell (vs bacterial doubling) <span class="c">abrupt onset of flu/COVID.</span></p>
+
+<h2>Pathogenesis, Host Defense &amp; Antivirals</h2>
+<p><b>CPE:</b> metabolic hijacking; membrane failure → lysis; <b>inclusions</b>: <b>Cowdry A</b> (nuclear, HSV), <b>Negri</b> (cytoplasmic, rabies) <span class="c">giant cells + Cowdry A on smear = HSV.</span> <b>Syncytia:</b> fused neighbours → spread hidden from antibodies (HSV, VZV).</p>
+<p><b>HPV 16/18 oncogenesis:</b> <b>E6</b> degrades <b>p53</b> (ubiquitin-proteasome; no repair/apoptosis); <b>E7</b> binds <b>pRb</b> → frees E2F → S-phase. <span class="c">OPSCC in tonsillar crypts, base of tongue.</span></p>
+<p><b>Sensing:</b> endosomal <b>TLR3</b> dsRNA · <b>TLR7/8</b> ssRNA · <b>TLR9</b> unmethylated CpG DNA; cytosolic <b>RIG-I/MDA5</b> (5′-triphosphate RNA, dsRNA). <span class="c">TLR3 defects → HSV encephalitis.</span></p>
+<p><b>Type I IFN:</b> paracrine → antiviral state (block protein synthesis, degrade RNA); causes prodromal fever, chills, aches.</p>
+<p><b>CD8⁺ CTL:</b> read viral peptides on <b>MHC I</b> → perforin/granzyme. <span class="c">Keeps EBV latent in B cells; failure → <b>oral hairy leukoplakia</b> (lateral tongue).</span> <b>Antibodies</b> neutralize free virions; sIgA blocks coxsackie attachment (herpangina).</p>
+<p><b>Evasion:</b> ↓ MHC I (NK backup kills "missing self"); IFN blockade; antigenic variation. <span class="c">CMV degrades MHC I → silent salivary shedding.</span></p>
+<p><b>HBV particles:</b> enveloped partial dsDNA; <b>Dane particle</b> = 42 nm infectious virion; <b>22 nm decoy</b> spheres/filaments of pure <b>HBsAg</b> outnumber it up to 100,000:1, soak up antibodies <span class="c">basis of recombinant HBsAg vaccine.</span></p>
+<p><b>Superinfection:</b> ruptured ulcers (HSV, coxsackie) let bacteria in; flu/RSV kill ciliated cells → 2° pneumonia; HIV → thrush; measles hits memory lymphocytes → transient immunosuppression. <span class="c">Impetiginized blisters need antibacterials.</span></p>
+<p><b>Oral reservoir:</b> salivary glands (mumps, CMV, EBV, rabies); GCF carries HBV, HCV, HIV; mucosal receptors (SARS-CoV-2, coxsackie); silent shedding. <span class="c">Mumps: bilateral parotitis, sheds before swelling.</span></p>
+<p><b>Oral sentinels:</b> <b>Measles — Koplik spots</b> (bluish-white macules, red buccal mucosa opposite molars; 24–48 h before rash) · <b>Coxsackie — herpangina</b> (vesicles soft palate/tonsillar pillars), <b>HFMD</b> (anterior oral ulcers + palms/soles) · <b>Rubella — Forchheimer spots</b> (soft-palate petechiae, prodrome).</p>
+<p><b>Antiviral principles:</b> target viral-specific enzymes; <b>virostatic</b> (can't clear latent/integrated); narrow safety margin; <b>prodrugs</b> activated by viral enzymes. <span class="c">Coxsackie/HFMD: supportive only.</span></p>
+<p><b>Acyclovir:</b> guanosine analog w/o chain-extension link (3′-OH); 1st phosphate by <b>viral thymidine kinase</b>, then host kinases → chain terminator. <b>Valacyclovir</b> = ester prodrug, better oral absorption; ganciclovir for CMV. <span class="c">Useless without viral TK (HPV, coxsackie, measles); for HSV/VZV.</span></p>
+<table>
+<tr><th>Class</th><th>Action · drugs · use</th></tr>
+<tr><td>NRTI</td><td>Lacks 3′-OH → terminates proviral DNA · tenofovir, emtricitabine, lamivudine, abacavir · HIV, chronic HBV</td></tr>
+<tr><td>NNRTI</td><td>Allosteric pocket locks RT · efavirenz, doravirine, rilpivirine · HIV</td></tr>
+<tr><td>Protease inh.</td><td>Block polyprotein cleavage → immature virions · nirmatrelvir (Paxlovid; COVID), darunavir (HIV), glecaprevir (HCV)</td></tr>
+<tr><td>Polymerase inh.</td><td>RdRP; chain stop or lethal mutagenesis · sofosbuvir (HCV), remdesivir, molnupiravir (COVID)</td></tr>
+<tr><td>Integrase inh.</td><td>Chelate Mg²⁺ → no integration · dolutegravir, bictegravir, raltegravir · 1st-line HIV + PEP</td></tr>
+<tr><td>Neuraminidase inh.</td><td>Block sialic-acid cleavage, trap virions · oseltamivir, zanamivir · influenza A/B</td></tr>
+</table>
+<p><span class="c">Paxlovid's <b>ritonavir</b> booster → CYP3A4 interactions with dental sedatives/narcotics.</span> <b>Resistance:</b> error-prone replication → <b>monotherapy</b> selects mutants; <b>combination</b> (different steps) = high genetic barrier.</p>
+
+<h2>Bloodborne Pathogens &amp; Occupational Risk</h2>
+<p>Sharps or mucosal splash; all saliva infectious (blood + GCF); <b>universal precautions</b> (carriage often silent); engineering controls (recapping sheaths, safety scalpels).</p>
+<table>
+<tr><th></th><th>HBV</th><th>HCV</th><th>HIV</th></tr>
+<tr><td>Sharps ("3s")</td><td><b>~30%</b> (HBeAg⁺ 22–31%, HBeAg⁻ 1–6%)</td><td><b>~3%</b></td><td><b>~0.3%</b> (1/300); mucosa 0.09%</td></tr>
+<tr><td>On surfaces</td><td>≥ 7 days</td><td>≤ 3 wk</td><td>&lt; 2 h dry</td></tr>
+<tr><td>Chronic</td><td>Adults 5–10%; newborns &gt;90%</td><td>75–85%</td><td>100%</td></tr>
+<tr><td>Outcome</td><td>Cirrhosis, HCC</td><td>Fibrosis, cirrhosis</td><td>CD4 loss, AIDS</td></tr>
+<tr><td>Vaccine</td><td>HBsAg, &gt;95%</td><td>No</td><td>No</td></tr>
+<tr><td>Drugs</td><td>Suppress</td><td>DAAs: &gt;95% cure</td><td>ART suppress</td></tr>
+<tr><td>PEP</td><td>HBIG + vaccine if non-immune</td><td>None; PCR follow-up</td><td>3-drug ART, &lt;72 h, 28 d</td></tr>
+</table>
+<p>HBV 10× HCV, 100× HIV. <b>HBV serology:</b> <b>HBsAg</b> = active infection, infectious · <b>anti-HBs</b> = immune (vaccine or recovered) · <b>anti-HBc</b> = natural infection past/present, <b>never from vaccine</b> · <b>HBeAg</b> = high replication/infectivity. <span class="c">Anti-HBs ≥ 10 mIU/mL + anti-HBc⁻ = vaccine immunity. Documented titres mandatory.</span> HBV spreads w/o visible blood.</p>
+<p><b>HDV:</b> smallest; circular RNA coding only HD antigen; needs HBV's <b>HBsAg</b> coat. Coinfection → severe acute, &lt;5% chronic; <b>superinfection</b> of chronic HBV → fulminant, cirrhosis 70–80%. <span class="c">HBV vaccine protects vs HDV.</span></p>
+<p><b>HCV</b> (env. (+)ssRNA, Flaviviridae): constant variants → no vaccine; DAAs 8–12 wk, no interferon; anti-HCV = exposure, <b>RNA PCR = active</b> <span class="c">PCR tells cured from viremic.</span></p>
+<p><b>HIV:</b> 2 RNA copies + RT, integrase, protease; <b>gp120</b> binds <b>CD4</b> (T<sub>H</sub>, macrophages, dendritic cells), coreceptor <b>CCR5</b>; <b>gp41</b> fusion. <span class="c">CCR5 Δ32/Δ32 → natural resistance.</span> Acute retroviral (2–4 wk, flu-like) → clinical latency 8–10 yr → <b>AIDS: CD4 &lt; 200/µL</b> (normal 500–1500) or AIDS-defining illness. <b>Oral signs:</b> pseudomembranous candidiasis, OHL (EBV), Kaposi sarcoma (HHV-8). ART → &lt; 20–50 copies/mL, CD4 rebounds; <b>U=U</b>; routine care, standard precautions (refusing care = unethical).</p>
+<div class="box"><p><b>PEP protocol:</b> ① wash wound w/ soap + water, flush mucosa w/ saline; <b>don't squeeze/scrub</b> ② report to supervisor ③ test source (HBV/HCV/HIV) with consent ④ HIV PEP ASAP — ideally <b>&lt; 2 h, max 72 h</b> ⑤ <b>28-day, 3-drug</b> ART. HBV: HBIG + vaccine only if non-immune.</p></div>
+<p><b>Solo practice</b> (2,000 pts): HBV ~680/100k (~50% undiagnosed) → seen every <b>2 wk</b>; HCV ~470/100k (~44% unaware) → every 2.5–3 wk; HIV ~170/100k (~11% unaware) → every 7 wk; HDV ~20/100k → every 1.5–2 yr. <span class="c">Infected patient weekly, usually unknown.</span></p>
+
+<h2>Other Oral Viruses, Vaccines, Aerobiology</h2>
+<p><b>Herpesviridae</b> (env. dsDNA, lifelong latency): <b>α neurotropic</b> (sensory ganglia) — <b>HSV-1/2</b>: trigeminal ganglion; primary gingivostomatitis, herpes labialis, herpetic whitlow; <b>VZV</b>: dorsal root/cranial ganglia; chickenpox → zoster, Ramsay Hunt · <b>β lymphotropic</b> — <b>CMV</b> (salivary glands, deep ulcers, congenital), HHV-6/7 · <b>γ oncogenic</b> — <b>EBV</b> (memory B cells; mono, OHL, Burkitt), <b>HHV-8</b> (Kaposi sarcoma). <span class="c">Dental trauma can reactivate; zoster = <b>unilateral, dermatomal, stops at midline</b>.</span></p>
+<p><b>Respiratory:</b> influenza A/B, SARS-CoV-2 (ageusia), RSV, rhino, adeno; droplet nuclei + fomites. Influenza <b>drift</b> = point mutations; <b>shift</b> = segment reassortment. <span class="c">Handpieces/ultrasonics aerosolize high-titre saliva → HVE at tip + fit-tested respirators.</span></p>
+<p><b>HPV:</b> HPV-OPSCC rising in young non-smokers; <b>HPV-16 &gt; 85%</b>; hidden in tonsillar crypts/base of tongue (unlike visible tobacco leukoplakia). Low-risk 6, 11, 13, 32 → squamous papilloma, <b>Heck disease</b>. <span class="c">Look for unilateral tonsil asymmetry, firm painless neck node.</span></p>
+<p><b>Vaccines:</b> <b>live-attenuated</b> (sIgA + IgG + CD8 memory; MMR, varicella; <b>contraindicated in severe immunocompromise</b>) · <b>inactivated</b> (adjuvant/boosters, mainly IgG; IPV, rabies) · <b>subunit/VLP</b> (safe, antibody-driven; HBV, HPV) · <b>mRNA</b> (LNP; humoral + cellular; SARS-CoV-2).</p>
+<p><b>Staff immunization:</b> HBV + titre; annual flu; MMR ×2 or serology; VZV vaccine or IgG; annual COVID; 9-valent HPV <span class="c">herd immunity.</span></p>
+<p><b>Aerobiology:</b> <b>aerosol &lt; 5 µm</b> (airborne for hours, reaches alveoli) · <b>5–50 µm</b> (settles 10–30 min) · <b>splatter &gt; 50 µm</b> (1–2 m, lands on surfaces/face/eyes). Sources: ultrasonic scalers, high-speed handpieces, air-water syringe.</p>
+<p><b>Disinfection:</b> Spaulding — touch surfaces = <b>non-critical → intermediate-level</b>. Susceptibility: enveloped viruses (easiest) → vegetative bacteria, fungi → <b>naked viruses + spores (hardest)</b>. <b>Tuberculocidal</b> kills naked viruses too.</p>
+<p><b>IPAC layers:</b> ① PPE (N95, eye shield, gown) ② HVE + pre-procedural rinse ③ barriers + tuberculocidal disinfectant ④ HBV immunization + PEP.</p>
+</div>
+</div>
+
+</body>
+</html>
