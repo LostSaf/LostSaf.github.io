@@ -1,190 +1,160 @@
-// The choreography. The front page starts blank; little Me comes out of the
-// corner, hoovers up what is left of the black screen as ink, and prints the
-// page one piece at a time. Anything further down gets printed when you
-// scroll to it.
+// The choreography. The page starts as white paper. Little Me comes out of the
+// corner, hoovers up what is left of the black screen as ink, builds the roof
+// sign out of it, and then rides the elevator down, stepping out on each floor
+// you scroll to and building the room one piece at a time.
 
-import { me, show, hop, say, fire, assemble, scatterDust, vacuum, wait, resolve, reduced, SCALE, inkOf } from './stage.js';
-import { printEl, printNow, namePoints } from './print.js';
+import { me, show, hop, walk, say, fire, assemble, scatterDust, vacuum, wait, reduced, SCALE, home } from './stage.js';
+import { buildIn, buildNow, namePoints } from './print.js';
+import { sfx } from './sfx.js';
 
-let skipped = false;
-let showing = false;
-let io = null;
+let skipped = false, showing = false, io = null, running = false;
 const queue = [];
-let running = false;
-let homeTimer = 0;
-
 const skipBtn = document.getElementById('skip-show');
 skipBtn.addEventListener('click', () => skipShow());
 
-const HOME = { home: true };
 const rectOf = (el) => () => el.getBoundingClientRect();
+const $ = (s) => document.querySelector(`#view ${s}`);
 
-// where Me should stand to print an element: just left of its bottom left
-// corner, or of whatever part of it is on screen
-function standBy(el) {
-  const r = el.getBoundingClientRect();
-  const visBottom = Math.min(r.bottom, innerHeight - 30);
-  const ay = r.height ? Math.max(0.2, Math.min(1, (visBottom - r.top) / r.height)) : 1;
-  const leftRoom = r.left > 8 * SCALE + 20;
-  return leftRoom
-    ? { el, ax: 0, ay, dx: -6 * SCALE, dy: 0 }
-    : { el, ax: 0, ay, dx: 7 * SCALE, dy: 12 * SCALE / 4 + 10 };
+// standing in the elevator car, or in the corner on small screens
+export function carAnchor() {
+  return {
+    fn: () => {
+      const box = $('.car__box');
+      const r = box && box.getBoundingClientRect();
+      if (!r || !r.width) return home();
+      return { x: r.left + r.width / 2, y: r.bottom - 12 };
+    },
+  };
+}
+// a point on a floor's ground, x in page pixels
+const groundAt = (floor, x) => ({
+  fn: () => {
+    const g = floor.querySelector('.floor__ground').getBoundingClientRect();
+    return { x: Math.max(g.left + 16, Math.min(g.right - 16, x())), y: g.top + 6 };
+  },
+});
+
+export function buildAll(root) {
+  root.querySelectorAll('[data-s="wait"], [data-s="building"]').forEach(buildNow);
+  const n = root.querySelector('#name');
+  n && n.classList.remove('is-dark');
 }
 
-export function isShowing() { return showing; }
-
-export async function landingShow(intro, art) {
-  const view = document.getElementById('view');
-  const $ = (s) => view.querySelector(s);
+export async function landingShow(intro) {
   showing = true;
   skipped = false;
   skipBtn.hidden = false;
+  const name = $('#name');
+  name.classList.add('is-dark');
+  const tower = $('.tower');
+  const roofSpot = (ax) => ({ el: tower, ax, ay: 0, dy: -16 });
 
   const steps = async () => {
     scatterDust(intro.dust || []);
     show({ x: -40, y: innerHeight + 60 });
-    await hop(HOME, { dur: 0.7, height: 120 });
+    await hop({ home: true }, { dur: 0.7, height: 120 });
     if (skipped) return;
-    say('hi!', 1.2);
-    await wait(0.7);
+    say('hi!', 1.1);
+    await wait(0.6);
     if (skipped) return;
     if (intro.dust && intro.dust.length) {
-      say('ooh. pixels.', 1.4);
-      await vacuum(1.8);
+      say('ooh. pixels.', 1.3);
+      sfx.suck();
+      await vacuum(1.7);
       if (skipped) return;
-      say('ink: 100%', 1.1);
-      await wait(0.6);
-    } else {
-      me.ink = 1;
+      say('ink: 100%', 1);
+      await wait(0.5);
     }
+    me.ink = 1;
     if (skipped) return;
 
-    // the name, built from flying pixels
-    const name = $('#name');
-    const nr = name.getBoundingClientRect();
-    const spot = { el: name, ax: Math.min(0.78, (innerWidth * 0.5 - nr.left) / nr.width), ay: 1, dx: 0, dy: 18 };
-    await hop(spot);
+    // the sign: the board first, then the name out of flying pixels
+    const sign = $('.sign');
+    await hop(roofSpot(0.5), { height: 160 });
     if (skipped) return;
-    me.aimTarget = () => { const r = name.getBoundingClientRect(); return { x: r.left + r.width * 0.45, y: r.top + r.height * 0.4 }; };
-    say('my name first', 1.3);
-    await assemble(namePoints(name), [inkOf('blue'), inkOf('pink'), '#17141c', '#17141c'], 1.9);
-    me.aimTarget = null;
-    printEl(name, { dur: 0.6 });
+    me.aimTarget = () => { const r = sign.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+    await Promise.all([fire(rectOf(sign), 0.6), buildIn(sign, { dur: 0.8 })]);
     if (skipped) return;
-
-    // the line above it
-    const kicker = $('.hero__kicker');
-    await hop(standBy(kicker));
-    if (skipped) return;
-    me.aimTarget = () => { const r = kicker.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top }; };
-    await Promise.all([fire(rectOf(kicker), 0.45), printEl(kicker, { dur: 0.6, delay: 0.1 })]);
+    say('my name first', 1.2);
+    await assemble(namePoints(name), ['#fff4d6', '#ffcf3f', '#ff4fa3', '#3ff0e0'], 1.8);
+    name.classList.remove('is-dark');
+    sfx.ding();
     me.aimTarget = null;
     if (skipped) return;
 
-    // the halftone, one ink at a time
-    const facts = $('.hero__facts');
-    await hop(standBy($('.hero__lede')));
+    // the notice and the water tank on the roof
+    const notice = $('.notice');
+    await walk(roofSpot(0.12), 260);
     if (skipped) return;
-    const artEl = $('.hero__art');
-    me.aimTarget = () => { const r = artEl.getBoundingClientRect(); return { x: r.left + r.width * 0.55, y: r.top + r.height * 0.45 }; };
-    for (const L of art.layers) {
-      if (skipped) return;
-      const from = { dx: (Math.random() - 0.5) * 50, dy: (Math.random() - 0.5) * 40 };
-      L.dx = from.dx; L.dy = from.dy;
-      const go = fire(rectOf(artEl), 0.5, [L.color]);
-      await new Promise((res) => {
-        const t0 = performance.now();
-        const step = (now) => {
-          const t = Math.min(1, (now - t0) / 650);
-          const e = 1 - Math.pow(1 - t, 3);
-          L.alpha = Math.min(1, t * 2.2);
-          L.dx = from.dx * (1 - e); L.dy = from.dy * (1 - e);
-          if (t < 1 && !skipped) requestAnimationFrame(step); else res();
-        };
-        requestAnimationFrame(step);
-      });
-      await go;
-    }
+    me.aimTarget = () => { const r = notice.getBoundingClientRect(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.4 }; };
+    await Promise.all([fire(rectOf(notice), 0.5), buildIn(notice, { dur: 0.7 })]);
+    const tank = $('.tank');
+    if (tank && tank.offsetWidth) {
+      await walk(roofSpot(0.82), 300);
+      me.aimTarget = () => { const r = tank.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+      await Promise.all([fire(rectOf(tank), 0.4), buildIn(tank, { dur: 0.5 })]);
+    } else buildNow(tank);
     me.aimTarget = null;
     if (skipped) return;
 
-    // the words under the name
-    const lede = $('.hero__lede');
-    me.aimTarget = () => { const r = lede.getBoundingClientRect(); return { x: r.left + r.width * 0.6, y: r.top + r.height * 0.5 }; };
-    await Promise.all([fire(rectOf(lede), 0.55), printEl(lede, { dur: 0.8, delay: 0.05 })]);
-    me.aimTarget = null;
+    // then the building goes up under the roof, a storey at a time
+    await raiseTower();
     if (skipped) return;
-
-    await hop(standBy(facts));
-    if (skipped) return;
-    me.aimTarget = () => { const r = facts.getBoundingClientRect(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.5 }; };
-    await Promise.all([fire(rectOf(facts), 0.5), printEl(facts, { dur: 0.7, delay: 0.05 })]);
-    me.aimTarget = null;
-    if (skipped) return;
-
-    // up to the top bar on the jetpack
-    const nav = $('.top');
-    say('wheee', 0.9);
-    await hop({ el: nav, ax: 0.42, ay: 1, dx: 0, dy: -4 }, { height: 120 });
-    if (skipped) return;
-    me.aimTarget = () => { const r = nav.getBoundingClientRect(); return { x: r.right - 120, y: r.top + r.height / 2 }; };
-    await Promise.all([fire(rectOf(nav), 0.5), printEl(nav, { dur: 0.6, delay: 0.05 })]);
-    me.aimTarget = null;
-    if (skipped) return;
-
-    const now = $('.hero__now');
-    await hop(standBy(now));
-    if (skipped) return;
-    await Promise.all([fire(rectOf(now), 0.35), printEl(now, { dur: 0.5 })]);
-    if (skipped) return;
-    await hop(HOME);
-    say('scroll down v', 2.6);
+    await hop(carAnchor(), { height: 90 });
+    say('scroll down v', 2.4);
   };
 
   if (reduced) {
-    printAll(view);
-    art.layers.forEach((L) => { L.alpha = 1; L.dx = L.dy = 0; });
-    show(HOME);
-    me.ink = 1;
+    buildAll(document.getElementById('view'));
+    show(carAnchor());
+    me.anchor = carAnchor();
   } else {
     await steps();
   }
-  if (skipped) {
-    art.layers.forEach((L) => { L.alpha = 1; L.dx = L.dy = 0; });
-  }
   showing = false;
   skipBtn.hidden = true;
-  watchScroll(view);
+  watchFloors(document.getElementById('view'));
 }
 
-function printAll(root) {
-  root.querySelectorAll('.pr').forEach(printNow);
+function raiseTower() {
+  const tower = $('.tower');
+  const rest = [$('.street'), $('.cornerstone')];
+  tower.dataset.s = 'done';
+  rest.forEach((el) => { el.dataset.s = 'done'; });
+  if (reduced) return Promise.resolve();
+  sfx.ding();
+  const a = tower.animate([{ clipPath: 'inset(-40px -40px 100% -40px)' }, { clipPath: 'inset(-40px -40px 0 -40px)' }], { duration: 1600, easing: 'steps(16, end)' });
+  let k = 0;
+  const t = setInterval(() => { sfx.build(); if (++k > 14) clearInterval(t); }, 100);
+  return a.finished.catch(() => {}).then(() => clearInterval(t));
 }
 
 function skipShow() {
   if (!showing) return;
   skipped = true;
   me.aimTarget = null;
-  const view = document.getElementById('view');
-  const hero = view.querySelector('.hero');
-  hero && hero.querySelectorAll('.pr').forEach(printNow);
+  const roof = $('.roof');
+  roof && roof.querySelectorAll('[data-s]').forEach(buildNow);
+  [$('.tower'), $('.street'), $('.cornerstone')].forEach(buildNow);
+  const n = $('#name');
+  n && n.classList.remove('is-dark');
   skipBtn.hidden = true;
   me.ink = 1;
-  setTimeout(() => { if (!me.moving) hop(HOME); else setTimeout(() => hop(HOME), 900); }, 50);
+  setTimeout(() => hop(carAnchor()), me.moving ? 900 : 60);
 }
 
-// ----------------------------------------------------------- scroll printing
-export function watchScroll(root) {
+// ----------------------------------------------------------------- the floors
+export function watchFloors(root) {
   stopWatching();
-  const waiting = [...root.querySelectorAll('.pr[data-s="wait"]')];
-  if (!waiting.length) return;
+  const floors = [...root.querySelectorAll('.floor')].filter((f) => f.querySelector('[data-s="wait"]'));
+  if (!floors.length) return;
   io = new IntersectionObserver((entries) => {
-    const fresh = entries.filter((e) => e.isIntersecting).map((e) => e.target)
-      .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
-    for (const el of fresh) { io.unobserve(el); if (el.dataset.s === 'wait') queue.push(el); }
-    if (fresh.length) runQueue();
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
-  waiting.forEach((el) => io.observe(el));
+    for (const e of entries) {
+      if (e.isIntersecting && !queue.includes(e.target)) { queue.push(e.target); io.unobserve(e.target); }
+    }
+    runQueue();
+  }, { threshold: 0.3 });
+  floors.forEach((f) => io.observe(f));
 }
 export function stopWatching() {
   io && io.disconnect();
@@ -192,40 +162,46 @@ export function stopWatching() {
   queue.length = 0;
 }
 
+const visible = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 40 && r.top < innerHeight - 40; };
+
 async function runQueue() {
   if (running) return;
   running = true;
-  clearTimeout(homeTimer);
   while (queue.length) {
-    const batch = queue.splice(0, queue.length).filter((el) => el.dataset.s === 'wait' && el.isConnected);
-    if (!batch.length) continue;
-    const onScreen = batch.filter((el) => {
-      const r = el.getBoundingClientRect();
-      return r.bottom > 0 && r.top < innerHeight;
-    });
-    batch.filter((el) => !onScreen.includes(el)).forEach(printNow);
-    if (!onScreen.length) continue;
-    if (reduced || onScreen.length > 8) { onScreen.forEach((el, i) => printEl(el, { dur: 0.5, delay: i * 0.05 })); continue; }
-
-    const first = onScreen[0];
-    await hop(standBy(first));
-    const union = () => {
-      const rs = onScreen.map((el) => el.getBoundingClientRect());
-      const l = Math.min(...rs.map((r) => r.left)), t = Math.min(...rs.map((r) => r.top));
-      const r = Math.max(...rs.map((r) => r.right)), b = Math.max(...rs.map((r) => r.bottom));
-      return { left: l, top: t, width: r - l, height: b - t };
-    };
-    me.aimTarget = () => { const u = union(); return { x: u.left + u.width / 2, y: u.top + u.height / 2 }; };
-    const inks = [...new Set(onScreen.map((el) => getComputedStyle(el).getPropertyValue('--ink-a').trim()).filter(Boolean))];
-    const prints = onScreen.map((el, i) => printEl(el, { dur: 0.7, delay: 0.08 + i * 0.13 }));
-    await Promise.all([fire(union, 0.35 + onScreen.length * 0.1, inks.length ? [...inks, inkOf('pink'), '#17141c'] : undefined), ...prints]);
-    me.aimTarget = null;
+    const floor = queue.shift();
+    if (!floor.isConnected) continue;
+    if (reduced || !visible(floor)) { floor.querySelectorAll('[data-s="wait"]').forEach(buildNow); continue; }
+    await buildFloor(floor);
   }
   running = false;
-  homeTimer = setTimeout(() => {
-    if (!running && !me.busy && !(me.anchor && me.anchor.home)) hop(HOME);
-  }, 1100);
+  if (!me.moving) hop(carAnchor(), { height: 80 });
 }
 
-export function goHomeSoon() { clearTimeout(homeTimer); homeTimer = setTimeout(() => { if (!me.busy) hop(HOME); }, 400); }
-export { printAll };
+async function buildFloor(floor) {
+  const items = [...floor.querySelectorAll('[data-s="wait"]')];
+  const head = items.shift();
+  const ground = floor.querySelector('.floor__ground').getBoundingClientRect();
+  // step out of the lift onto this floor
+  await hop(groundAt(floor, () => floor.querySelector('.floor__ground').getBoundingClientRect().right - 30), { height: 70 });
+  if (head) {
+    me.aimTarget = () => { const r = head.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+    await Promise.all([fire(rectOf(head), 0.3), buildIn(head, { dur: 0.45 })]);
+  }
+  // then the room, right to left, a few things at a time
+  items.sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
+  void ground;
+  while (items.length) {
+    if (!visible(floor)) { items.forEach(buildNow); break; }
+    const batch = items.splice(0, 3);
+    const lead = batch[0];
+    await walk(groundAt(floor, () => { const r = lead.getBoundingClientRect(); return r.left + r.width + 24; }), 340);
+    const union = () => {
+      const rs = batch.map((el) => el.getBoundingClientRect());
+      const l = Math.min(...rs.map((r) => r.left)), t = Math.min(...rs.map((r) => r.top));
+      return { left: l, top: t, width: Math.max(...rs.map((r) => r.right)) - l, height: Math.max(...rs.map((r) => r.bottom)) - t };
+    };
+    me.aimTarget = () => { const u = union(); return { x: u.left + u.width / 2, y: u.top + u.height / 2 }; };
+    await Promise.all([fire(union, 0.3 + batch.length * 0.12), ...batch.map((el, i) => buildIn(el, { dur: 0.6, delay: i * 0.12 }))]);
+  }
+  me.aimTarget = null;
+}

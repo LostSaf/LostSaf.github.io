@@ -1,0 +1,145 @@
+#boba-root {
+  --b-bg: #ffffff;
+  --b-fg: #222;
+  --b-border: #d8d8de;
+  --b-accent: #2f9e44;
+  --b-soft: #f1f1f5;
+  position: fixed;
+  bottom: 6px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  text-align: left;
+  pointer-events: none;
+}
+.nightMode #boba-root,
+:root[data-bs-theme="dark"] #boba-root {
+  --b-bg: #2b2b30;
+  --b-fg: #ececf0;
+  --b-border: #45454d;
+  --b-soft: #38383f;
+}
+#boba-root.corner-br { right: 8px; align-items: flex-end; }
+#boba-root.corner-bl { left: 8px; align-items: flex-start; }
+#boba-root > * { pointer-events: auto; }
+
+/* ---------- reset Anki's global styles inside Boba ---------- */
+#boba-root, #boba-root * { box-sizing: border-box; }
+#boba-root button {
+  appearance: none; -webkit-appearance: none;
+  min-width: 0; min-height: 0; margin: 0;
+  box-shadow: none; text-shadow: none; background-image: none;
+  font-family: inherit; line-height: 1.2;
+}
+#boba-root textarea { min-height: 0; margin: 0; box-shadow: none; font-family: inherit; }
+
+/* ---------- speech panel ---------- */
+#boba-panel {
+  position: relative;
+  width: 330px;
+  max-width: calc(100vw - 28px);
+  background: var(--b-bg);
+  color: var(--b-fg);
+  border: 1px solid var(--b-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  animation: boba-pop 0.25s ease-out;
+}
+#boba-panel::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  width: 12px; height: 12px;
+  background: var(--b-bg);
+  border-right: 1px solid var(--b-border);
+  border-bottom: 1px solid var(--b-border);
+  transform: rotate(45deg);
+}
+.corner-br #boba-panel::after { right: 168px; }
+.corner-bl #boba-panel::after { left: 168px; }
+#boba-panel[hidden], #boba-panel [hidden] { display: none !important; }
+@keyframes boba-pop { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: none; } }
+
+#boba-close {
+  position: absolute; top: 8px; right: 8px;
+  width: 22px; height: 22px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 50%;
+  color: var(--b-fg); opacity: 0.5; font-size: 16px; line-height: 1; cursor: pointer;
+}
+#boba-close:hover { opacity: 1; background: var(--b-soft); }
+
+.boba-hello { font-weight: 600; margin: 0 0 6px; padding-right: 28px; }
+.boba-opt {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; margin-top: 6px; padding: 9px 12px;
+  background: var(--b-soft); color: var(--b-fg);
+  border: 1px solid var(--b-border); border-radius: 10px;
+  font-size: 14px; text-align: left; cursor: pointer;
+}
+.boba-opt:hover { border-color: var(--b-accent); }
+
+#boba-reply { max-height: 45vh; overflow-y: auto; line-height: 1.5; padding-right: 4px; }
+#boba-reply pre {
+  background: var(--b-soft); padding: 8px; border-radius: 8px;
+  white-space: pre-wrap; font-size: 12.5px;
+}
+#boba-reply code { background: var(--b-soft); padding: 1px 4px; border-radius: 4px; font-size: 12.5px; }
+.boba-error { color: #e03131; }
+.boba-thinking span { animation: boba-dot 1.2s infinite; opacity: 0; }
+.boba-thinking span:nth-child(2) { animation-delay: 0.2s; }
+.boba-thinking span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes boba-dot { 0%, 60%, 100% { opacity: 0; } 30% { opacity: 1; } }
+
+#boba-ask textarea {
+  width: 100%; box-sizing: border-box; resize: vertical; margin-top: 8px;
+  background: var(--b-soft); color: var(--b-fg);
+  border: 1px solid var(--b-border); border-radius: 10px;
+  padding: 8px 10px; font: inherit; outline: none;
+}
+#boba-ask textarea:focus { border-color: var(--b-accent); }
+.boba-row, #boba-foot { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
+.boba-small {
+  padding: 5px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; width: auto;
+  background: var(--b-soft); color: var(--b-fg); border: 1px solid var(--b-border);
+}
+.boba-small.primary { background: var(--b-accent); color: #fff; border-color: var(--b-accent); }
+
+/* ---------- Boba (sprite rendered from a 3D model) ---------- */
+#boba-stage { position: relative; display: flex; align-items: flex-end; gap: 4px; }
+.corner-bl #boba-stage { flex-direction: row-reverse; }
+#boba-walker { position: relative; width: 200px; height: 140px; will-change: transform; }
+#boba-cat {
+  width: 200px; height: 140px;
+  cursor: pointer; user-select: none;
+  background: url(boba_sprite.webp) 0 0 / 1600px auto no-repeat;
+}
+/* the sprite faces right; in the right-hand corner Boba faces the page */
+.corner-br #boba-cat { transform: scaleX(-1); }
+
+#boba-paw {
+  flex: 0 0 auto; width: 26px; height: 26px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--b-bg); border: 1px solid var(--b-border);
+  font-size: 13px; line-height: 1; cursor: pointer; margin-bottom: 4px;
+  opacity: 0.55; transition: opacity 0.2s, transform 0.2s;
+}
+#boba-paw:hover { opacity: 1; transform: scale(1.1); }
+
+.boba-zzz {
+  position: absolute; top: 46px; pointer-events: none;
+  font: italic 700 12px system-ui, sans-serif; color: #8a8a99;
+}
+.corner-br .boba-zzz { left: 18px; }
+.corner-bl .boba-zzz { right: 18px; }
+.boba-zzz span { position: absolute; opacity: 0; }
+.boba-zzz span:nth-child(2) { left: 9px; top: -9px; font-size: 10px; }
+.boba-asleep .boba-zzz span { animation: boba-zzz 3.4s ease-in-out infinite; }
+.boba-asleep .boba-zzz span:nth-child(2) { animation-delay: 1.2s; }
+.boba-awake .boba-zzz { display: none; }
+
+@keyframes boba-zzz { 0% { opacity: 0; transform: translate(0, 4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -10px); } }

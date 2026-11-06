@@ -130,13 +130,13 @@ export function mount(host) {
       const { st, p } = best;
       g.strokeStyle = '#ffc414'; g.lineWidth = 1.5;
       g.strokeRect(p[0] - 9, p[1] - 9, 18, 18);
-      g.font = '500 12px "Martian Mono", monospace';
+      g.font = '500 12px "Atkinson Hyperlegible Mono", monospace';
       const label = `${st.n}  mag ${st.mag.toFixed(2)}`;
       const tw2 = g.measureText(label).width;
       g.fillStyle = 'rgba(5,6,15,.85)'; g.fillRect(p[0] + 14, p[1] - 22, tw2 + 14, 22);
       g.fillStyle = '#ffc414'; g.fillText(label, p[0] + 21, p[1] - 7);
     }
-    g.font = '400 10px "Silkscreen", monospace';
+    g.font = '400 10px "Jersey 10", sans-serif';
     g.fillStyle = 'rgba(255,255,255,.4)';
     g.fillText(`${stars.length} REAL STARS  /  DRAG, SCROLL TO ZOOM, HOVER A BRIGHT ONE`, 16, h - 16);
   });

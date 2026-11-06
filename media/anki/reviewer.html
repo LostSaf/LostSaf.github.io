@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anki reviewer, pretend</title>
+<!--
+  A stand-in for Anki's reviewer. It loads a study cat add-on's own CSS and
+  JavaScript (cats.js or boba.js, unchanged) and plays the part of Anki's
+  Python side: pycmd() is the bridge the add-on calls, and the replies come
+  back through the same functions Anki would call. In Anki the reply comes
+  live from Claude; here it is one saved answer.
+-->
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { font: 20px/1.5 Arial, sans-serif; background: #f0f0f0; color: #1b1b1b; display: grid; grid-template-rows: 1fr auto; }
+  #qa { overflow: auto; padding: 28px 20px 140px; text-align: center; }
+  #qa .q { font-size: 21px; }
+  #qa hr { border: 0; border-top: 1px solid #ccc; margin: 18px auto; max-width: 520px; }
+  #qa .a { font-size: 26px; font-weight: bold; }
+  #qa svg { width: 220px; margin: 16px auto 0; display: block; border: 1px solid #bbb; }
+  #bottom { background: #e4e4e4; border-top: 1px solid #c8c8c8; padding: 10px; display: flex; justify-content: center; gap: 8px; font-size: 13px; }
+  #bottom button { font: 13px Arial, sans-serif; padding: 7px 16px; border: 1px solid #aaa; border-radius: 4px; background: #fafafa; }
+  #bottom small { display: block; font-size: 11px; color: #666; }
+  .night { background: #2c2c2c; color: #ddd; }
+  .night #bottom { background: #222; border-color: #111; }
+</style>
+</head>
+<body>
+<div id="qa">
+  <div class="q">Gram positive rods in long chains, spore forming. Which genus?</div>
+  <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" aria-label="Gram stain"><rect width="200" height="150" fill="#f4eefc"/>
+    <g fill="#5b2a91"><rect x="20" y="30" width="24" height="7" rx="3.5"/><rect x="45" y="33" width="24" height="7" rx="3.5"/><rect x="70" y="37" width="24" height="7" rx="3.5"/><rect x="95" y="42" width="24" height="7" rx="3.5"/>
+    <rect x="60" y="90" width="24" height="7" rx="3.5" transform="rotate(-20 60 90)"/><rect x="83" y="82" width="24" height="7" rx="3.5" transform="rotate(-20 83 82)"/><rect x="106" y="74" width="24" height="7" rx="3.5" transform="rotate(-20 106 74)"/>
+    <rect x="130" y="110" width="24" height="7" rx="3.5" transform="rotate(15 130 110)"/><rect x="153" y="116" width="24" height="7" rx="3.5" transform="rotate(15 153 116)"/></g></svg>
+  <hr>
+  <div class="a">Bacillus</div>
+</div>
+<div id="bottom"><button>Again<small>1m</small></button><button>Hard<small>6m</small></button><button>Good<small>10m</small></button><button>Easy<small>4d</small></button></div>
+
+<script>
+  var addon = new URLSearchParams(location.search).get('addon') === 'boba' ? 'boba' : 'cats';
+  if (new URLSearchParams(location.search).get('night') === '1') document.body.className = 'night';
+
+  var EXPLAIN =
+    "**Bacillus**\n\n" +
+    "**Why it fits:** *Bacillus* species are Gram positive rods that often line up end to end in chains, and they make endospores. Gram positive, rod, chains, spores: that combination points here.\n\n" +
+    "**Key ideas**\n" +
+    "- Gram positive: a thick peptidoglycan wall keeps the crystal violet, so the cells look purple.\n" +
+    "- Endospores: tough dormant forms that survive heat, drying and disinfectants.\n" +
+    "- *B. anthracis* causes anthrax and is known for its boxcar chains. *B. cereus* causes food poisoning from reheated rice.\n\n" +
+    "**Common mix-up:** *Clostridium* is also a Gram positive spore forming rod. Oxygen settles it: *Bacillus* grows with air, *Clostridium* is anaerobic.\n\n" +
+    "**Memory aid:** Bacillus is boxcars that breathe. Mrrp.";
+  var ASKED =
+    "This demo has one saved answer, so we cannot answer that here. In Anki we send your question and this card to Claude and reply live, and you can keep asking follow-ups about the same card.";
+
+  function reply(text) {
+    var think = addon === 'cats' ? window.catsThinking : window.bobaThinking;
+    var answer = addon === 'cats' ? window.catsReply : window.bobaReply;
+    think && think();
+    setTimeout(function () { answer && answer(text, false); }, 1300);
+  }
+  // Anki's bridge, played by this page
+  window.pycmd = function (msg) {
+    if (/:explain$/.test(msg)) reply(EXPLAIN);
+    else if (/:ask:/.test(msg)) reply(ASKED);
+  };
+
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = addon + (addon === 'cats' ? '.css' : '.css');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.src = addon === 'cats' ? 'cats.js' : 'boba.js';
+  js.onload = function () {
+    var opts = { corner: 'bottom-right', shortcut: 'Ctrl+B' };
+    if (addon === 'cats') window.catsReset && catsReset(opts);
+    else window.bobaReset && bobaReset(opts);
+  };
+  document.body.appendChild(js);
+</script>
+</body>
+</html>

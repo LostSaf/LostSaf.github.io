@@ -8,20 +8,20 @@ body > *:not(#cv) { display: none !important; }
 #cv {
   display: block !important;
   color: #111;
-  font: 400 8.6pt/1.38 "Familjen Grotesk", Arial, sans-serif;
+  font: 400 8.6pt/1.38 "Atkinson Hyperlegible Next", Arial, sans-serif;
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
 }
 #cv header { border-bottom: 2pt solid #111; padding-bottom: 6pt; margin-bottom: 8pt; position: relative; }
 #cv header::after { content: ""; position: absolute; right: 0; top: 0; width: 18pt; height: 18pt; background: #2b44e0; box-shadow: 6pt 6pt 0 #ff4d9a; }
-#cv h1 { font: 700 26pt/1 "Bodoni Moda", Didot, serif; margin: 0; letter-spacing: -.02em; }
+#cv h1 { font: 400 34pt/.9 "Jersey 10", sans-serif; margin: 0; text-transform: uppercase; }
 #cv header p { margin: 3pt 0 0; }
-#cv .cv-links { font: 400 7.5pt/1.4 "Martian Mono", monospace; color: #444; }
+#cv .cv-links { font: 400 7.5pt/1.4 "Atkinson Hyperlegible Mono", monospace; color: #444; }
 #cv .cv-lede { font-size: 9.5pt; margin: 0 0 8pt; }
-#cv h2 { font: 400 8pt/1 "Silkscreen", monospace; margin: 10pt 0 5pt; color: #2b44e0; letter-spacing: .04em; }
+#cv h2 { font: 400 15pt/1 "Jersey 10", sans-serif; margin: 10pt 0 5pt; color: #2b44e0; letter-spacing: .04em; }
 #cv .cv-p { break-inside: avoid; margin-bottom: 5pt; }
-#cv .cv-p h3 { font: 600 10pt/1.2 "Bodoni Moda", serif; margin: 0; }
-#cv .cv-p h3 span { font: 400 7pt/1 "Martian Mono", monospace; color: #555; margin-left: 4pt; }
+#cv .cv-p h3 { font: 600 10pt/1.2 "Atkinson Hyperlegible Next", Arial, sans-serif; margin: 0; }
+#cv .cv-p h3 span { font: 400 7pt/1 "Atkinson Hyperlegible Mono", monospace; color: #555; margin-left: 4pt; }
 #cv .cv-p p { margin: 1pt 0 0; }
 #cv .cv-p ul { margin: 1pt 0 0; padding-left: 11pt; color: #333; }
 #cv .cv-skills p { margin: 0 0 2pt; }
-#cv .cv-foot { margin-top: 10pt; font: 400 7pt/1 "Martian Mono", monospace; color: #777; }
+#cv .cv-foot { margin-top: 10pt; font: 400 7pt/1 "Atkinson Hyperlegible Mono", monospace; color: #777; }

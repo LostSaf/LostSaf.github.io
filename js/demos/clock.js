@@ -31,7 +31,7 @@ function scene(g, x, y, w, h, t) {
   g.fillStyle = '#fff'; g.beginPath(); g.arc(sx, sy, 3.5, 0, 6.283); g.fill();
   const name = 'AMELIA';
   const n = Math.min(name.length, Math.floor(p * 9));
-  g.font = `700 ${Math.round(h * 0.17)}px "Bodoni Moda", serif`;
+  g.font = `700 ${Math.round(h * 0.17)}px "Jersey 10", sans-serif`;
   g.fillStyle = '#fbfaf6'; g.textAlign = 'center';
   g.fillText(name.slice(0, n) + (Math.floor(t * 3) % 2 ? '|' : ' '), x + w / 2, y + h * 0.78);
   g.textAlign = 'left';
@@ -62,11 +62,11 @@ export function mount(host) {
 
   const ctl = el('div', { class: 'dpanel', style: 'left:14px;bottom:14px;right:14px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:10px 14px' });
   ctl.innerHTML = `
-    <label style="display:flex;gap:10px;align-items:center;font:400 11px 'Martian Mono',monospace">
+    <label style="display:flex;gap:10px;align-items:center;font:400 11px "Atkinson Hyperlegible Mono",monospace">
       Screenshot takes <input type="range" min="10" max="160" value="${shotMs}" style="accent-color:#ff5b2e;width:150px"> <b class="ms" style="color:#ffc414;min-width:46px">${shotMs} ms</b>
     </label>
     <button class="dbtn" data-rec style="margin:0">Record again</button>
-    <span class="cnt" style="font:400 11px 'Martian Mono',monospace;color:#b9b4c0"></span>`;
+    <span class="cnt" style="font:400 11px "Atkinson Hyperlegible Mono",monospace;color:#b9b4c0"></span>`;
   host.appendChild(ctl);
   const range = ctl.querySelector('input');
   const cnt = ctl.querySelector('.cnt');
@@ -89,16 +89,16 @@ export function mount(host) {
     const lanes = [['WALL CLOCK', wall, INK.pink], ['VIRTUAL CLOCK', virt, '#7fe3b0']];
     lanes.forEach(([label, frames, col], i) => {
       const x = pad + i * (colW + gap), y = 40;
-      g.font = '400 11px "Silkscreen", monospace'; g.fillStyle = col;
+      g.font = '400 11px "Jersey 10", sans-serif'; g.fillStyle = col;
       g.fillText(label, x, 26);
       // the encoded video plays its frames back at 30 a second, whatever they were
       const idx = Math.floor(play * FPS) % Math.max(1, Math.ceil(DUR * FPS));
       const fi = Math.min(frames.length - 1, idx);
       const shown = idx < frames.length ? frames[fi] : null;
       if (shown !== null) scene(g, x, y, colW, scrH, shown);
-      else { g.fillStyle = '#000'; g.fillRect(x, y, colW, scrH); g.fillStyle = '#ff8fb8'; g.font = '400 11px "Silkscreen", monospace'; g.fillText('VIDEO ALREADY ENDED', x + 14, y + 24); }
+      else { g.fillStyle = '#000'; g.fillRect(x, y, colW, scrH); g.fillStyle = '#ff8fb8'; g.font = '400 11px "Jersey 10", sans-serif'; g.fillText('VIDEO ALREADY ENDED', x + 14, y + 24); }
       g.strokeStyle = col; g.lineWidth = 2; g.strokeRect(x, y, colW, scrH);
-      g.fillStyle = 'rgba(251,250,246,.6)'; g.font = '400 10px "Martian Mono", monospace';
+      g.fillStyle = 'rgba(251,250,246,.6)'; g.font = '400 10px "Atkinson Hyperlegible Mono", monospace';
       g.fillText(`${frames.length} frames, plays for ${(frames.length / FPS).toFixed(2)}s`, x, y + scrH + 18);
 
       // the timeline: when each frame was taken, in scene time

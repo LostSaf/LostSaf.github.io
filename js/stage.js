@@ -4,6 +4,7 @@
 // element, so when the page scrolls he scrolls with whatever he is standing on.
 
 import { compose, drawText, textWidth, ORIGIN, BUF, onOutfit } from './sprite.js';
+import { sfx } from './sfx.js';
 
 export const INKS = ['#2b44e0', '#ff4d9a', '#ffc414', '#00897b', '#ff5b2e', '#8e5bd6'];
 const INK_BY_NAME = { blue: '#2b44e0', pink: '#ff4d9a', yolk: '#ffc414', teal: '#00897b', tomato: '#ff5b2e', violet: '#8e5bd6', moss: '#3a9d4f' };
@@ -115,6 +116,7 @@ export async function hop(target, o = {}) {
   faceToward(b0.x);
   me.flame = dist > 140;
   me.look = -0.2;
+  sfx.jump();
   await tween(dur, (t) => {
     const b = resolve(target);
     const e = ease.sine(t);
@@ -127,6 +129,7 @@ export async function hop(target, o = {}) {
   me.flame = false;
   me.look = 0;
   puff(me.x, me.y, 6);
+  sfx.land();
   me.moving--;
 }
 
@@ -142,7 +145,9 @@ export async function walk(target, speed = 120) {
     me.x = a + (b.x - a) * t;
     me.y = b.y;
     me.pose = 'walk';
-    me.step = Math.floor(Math.abs(me.x - a) / (2.2 * SCALE));
+    const st = Math.floor(Math.abs(me.x - a) / (2.2 * SCALE));
+    if (st !== me.step && st % 2 === 0) sfx.step();
+    me.step = st;
   });
   me.anchor = target;
   me.pose = 'idle';
@@ -217,7 +222,7 @@ let breatheAt = 0;
 
 hit.addEventListener('click', () => {
   if (me.busy || !me.visible) return;
-  const lines = ['hi!', 'hire me?', 'ink: 100%', 'i made this', 'boop', '~ ~ ~', 'scroll v', 'press ctrl+p'];
+  const lines = ['hi!', 'hire me?', 'i work here', 'i built this', 'boop', '~ ~ ~', 'going down?', 'press ctrl+p'];
   say(lines[(Math.random() * lines.length) | 0]);
   const at = me.anchor;
   hop({ x: me.x, y: me.y }, { dur: 0.42, height: 34 }).then(() => { me.anchor = at; });
@@ -272,6 +277,7 @@ function frame(now) {
       const tx = r.left + Math.random() * r.width, ty = r.top + Math.random() * r.height;
       parts.push({ kind: 'shot', x: m.x, y: m.y, sx: m.x, sy: m.y, tx, ty, age: 0, life: 0.22 + Math.random() * 0.22, c: job.colors[(Math.random() * job.colors.length) | 0], s: SCALE * (Math.random() < 0.3 ? 1.5 : 1), arc: -20 - Math.random() * 60 });
     }
+    sfx.spray();
     if (now > job.until) { fireJobs.delete(job); job.res(); }
   }
 
@@ -382,6 +388,7 @@ function drawMe(now) {
     else {
       const s = 2;
       const text = b.text.slice(0, Math.max(1, Math.floor((now - b.t0) / 35)));
+      if (text.length < b.text.length && text.length !== b.shown) { b.shown = text.length; sfx.type(); }
       const tw = textWidth(b.text, s);
       const bw = tw + 14, bh = 7 * s + 12;
       let bx = Math.round(me.x - bw / 2 + me.facing * 10), by = Math.round(me.y - 24 * SCALE - bh - 6);

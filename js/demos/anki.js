@@ -50,7 +50,7 @@ export function mount(host) {
   win.innerHTML = `
     <div style="display:flex;gap:16px;align-items:center;padding:8px 14px;background:#1f1f1f;font-size:13px;border-bottom:1px solid #111">
       <b style="font-weight:600">Decks</b><span>Add</span><span>Browse</span><span>Stats</span>
-      <span style="margin-left:auto;font:400 11px 'Martian Mono',monospace;color:#9a9a9a" class="ak-status"></span>
+      <span style="margin-left:auto;font:400 11px "Atkinson Hyperlegible Mono",monospace;color:#9a9a9a" class="ak-status"></span>
     </div>
     <div class="ak-card" style="overflow:auto;display:grid;place-items:center;padding:24px;text-align:center"></div>
     <div style="display:flex;gap:10px;justify-content:center;align-items:center;padding:12px;background:#1f1f1f;border-top:1px solid #111;flex-wrap:wrap" class="ak-bar"></div>`;

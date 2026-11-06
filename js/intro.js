@@ -216,9 +216,9 @@ function drawLabel(ctx, rect, blur) {
   ctx.scale(sx, sx);
   if (blur) ctx.filter = `blur(${blur}px)`;
   ctx.fillStyle = '#fff';
-  ctx.font = '500 12px "Martian Mono", monospace';
+  ctx.font = '400 21px "Jersey 10", sans-serif';
   ctx.textBaseline = 'middle';
-  const spacing = 12 * 0.5;
+  const spacing = 21 * 0.32;
   const chars = LABEL.toUpperCase().split('');
   let w = 0;
   for (const ch of chars) w += ctx.measureText(ch).width + spacing;
@@ -233,7 +233,7 @@ function drawLabel(ctx, rect, blur) {
   ctx.restore();
 }
 
-export function runIntro({ reduced = false } = {}) {
+export function runIntro({ reduced = false, onBreak = null } = {}) {
   return new Promise((resolve) => {
     const root = document.getElementById('intro');
     const canvas = document.getElementById('intro-gl');
@@ -275,6 +275,7 @@ export function runIntro({ reduced = false } = {}) {
       };
       tiltLoop();
       btn.addEventListener('click', () => {
+        onBreak && onBreak();
         const r = btn.getBoundingClientRect();
         document.body.classList.add('is-breaking');
         root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: reduced ? 300 : 600, fill: 'forwards' })
@@ -555,6 +556,7 @@ export function runIntro({ reduced = false } = {}) {
     const go = (e) => {
       if (breaking) return;
       breaking = true;
+      onBreak && onBreak();
       breakT0 = performance.now();
       const r = btn.getBoundingClientRect();
       const kb = !e || e.detail === 0;
