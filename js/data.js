@@ -33,7 +33,7 @@ export const floors = [
   { id: 'studio', no: '7', name: 'Studio', blurb: 'Websites, and the machinery behind them.' },
   { id: 'lab', no: '6', name: 'Lab', blurb: 'Browser extensions and AI tools.' },
   { id: 'arcade', no: '5', name: 'Arcade', blurb: 'Games: Roblox in Luau, and Unity in C#.' },
-  { id: 'study', no: '4', name: 'Study', blurb: 'Anki add-ons. Boba and Aloe sleep on the desk.' },
+  { id: 'study', no: '4', name: 'Study', blurb: 'Study tools: Anki add-ons and a tooth trainer. Boba and Aloe sleep on the desk.' },
   { id: 'gifts', no: '3', name: 'Gifts', blurb: 'Websites I made for my girlfriend.' },
   { id: 'atelier', no: '2', name: 'Atelier', blurb: 'Fashion: creative direction and styling.' },
   { id: 'workshop', no: '1', name: 'Workshop', blurb: 'The tools. Pick one and the building lights up where I used it.' },
@@ -429,6 +429,31 @@ projects.push(
     numbers: [['7', 'people'], ['3', 'models chained']],
   },
 
+  // ---------------------------------------------------------------- study, dental
+  {
+    slug: 'toothid', floor: 'study', card: 'dental',
+    title: 'ToothID',
+    short: 'A dental anatomy trainer built from real patients\' teeth: name each one from three angles.',
+    year: '2026', role: 'Solo',
+    tags: ['3D software renderer', 'STL meshes', 'Python', 'Spaced repetition', 'Dental anatomy'],
+    lede:
+      'A practical exam trainer for tooth identification. Every question shows one real tooth, scanned from a real patient, from three angles at once, and asks which tooth it is. It started as an atlas with one tooth per position; this version uses real teeth from two different people, so you learn how the same tooth varies between mouths.',
+    media: [],
+    demos: [{ id: 'toothid', title: 'The real trainer, on 26 real teeth', note: "This is ToothID itself, running on Patient A's 26 teeth. Drag any of the three views to turn the tooth, scroll to zoom, then answer. The library, numbering drills and review are in the tabs. Patient B's 14 teeth download when the full app first runs." }],
+    built: [
+      'Its own 3D viewer for raw STL scans, binary or text: each tooth is parsed once and cached, then drawn on a plain canvas by a small renderer that sorts the triangles back to front and shades each one. Drag to rotate, scroll to zoom.',
+      "Three views of the same tooth at once, at angles set by each question's protocol.",
+      '15 three angle viewing protocols per tooth: up to 600 identification sets from 40 real teeth, and 180 side by side comparisons of the same tooth in two people.',
+      'Practice modes for the exact tooth, a mixed bank, numbering systems (FDI, Universal, Palmer), morphology, and spaced review keyed to the positions you miss.',
+      'Two crown prepared molars left out of the bank, so a crown preparation is never mistaken for natural anatomy.',
+      'A Python launcher that downloads both datasets on first run and says exactly what to do if one is blocked.',
+      'About ten builds over two days, from a one tooth atlas to real scans from two patients.',
+    ],
+    hard: [['Blank screens on some computers', 'An early build cleaned each high resolution scan separately in all three WebGL viewers and some machines gave up and showed nothing. The next build cleaned each tooth once and cached it; version 4 went further and draws with its own canvas renderer, so a weak or blocked GPU can never leave a panel blank.']],
+    numbers: [['40', 'real teeth'], ['2', 'patients'], ['600', 'identification sets'], ['15', 'angles a tooth']],
+    credit: 'Patient A: 3Dentes by Nate Saindon, CC BY-NC 4.0. Patient B: Diaz, Ferro Sanchez and Campo (2024), Mendeley Data, CC BY 4.0.',
+  },
+
   // ---------------------------------------------------------------- arcade, Unity
   {
     slug: 'monsters-in-the-office', floor: 'arcade',
@@ -470,6 +495,27 @@ projects.push(
     ],
     hard: [],
     numbers: [['3', 'pages'], ['1', 'person it is for']],
+  },
+  {
+    slug: 'alone', floor: 'gifts', seal: '#3a2b6b',
+    title: 'alone',
+    short: 'A story you light yourself. His shadow holds what loneliness says, until someone is there.',
+    year: '2026', role: 'Solo',
+    tags: ['Canvas', 'Shadow casting', 'Interaction', 'HTML'],
+    lede:
+      'A night, one figure, and a light you hold. Wherever you point it, his shadow falls away from you, and the words living in that shadow (no one is coming, nobody asked, it never stops) only survive where it is still dark. Bring the light round and they wash out, and he is not alone any more.',
+    media: [],
+    demos: [{ id: 'alone', title: 'Hold the light', note: 'The piece itself. Move your cursor, or your finger, to move the light.' }],
+    built: [
+      'Shadows cast from your light by real geometry: the figure and the flowers are shapes, and their shadows are projected away from wherever your light is.',
+      'Words drawn inside the shadow and masked by it, so the light really does erase them.',
+      'Night giving way to a warm noon haze as the story moves on, with a vignette that dissolves with the dark.',
+      'Depth layering, so flowers rooted nearer than the figure grow up over his feet.',
+      'A figure drawn to real proportions, 7.6 heads tall, built from one half and mirrored.',
+      'Canvas only, one HTML file, no libraries, and it calms down for people who prefer reduced motion.',
+    ],
+    hard: [],
+    numbers: [['5', 'versions'], ['0', 'libraries'], ['1', 'HTML file']],
   },
   {
     slug: 'written-in-real-stars-gift', floor: 'gifts', seal: '#2b44e0', alias: 'written-in-real-stars',
@@ -530,7 +576,7 @@ export const skills = [
     ['JavaScript', ['written-in-real-stars', 'ad-factory', 'boba-and-aloe', 'boba-3d', 'bigger-card-images']],
     ['WebGL and GLSL', ['written-in-real-stars']],
     ['three.js', ['written-in-real-stars']],
-    ['Canvas', ['ad-factory']],
+    ['Canvas', ['ad-factory', 'alone']],
     ['HTML and CSS', ['written-in-real-stars', 'boba-and-aloe']],
   ]},
   { group: 'Back end', items: [
@@ -549,12 +595,13 @@ export const skills = [
     ['Game design', ['tides-of-qingdao', 'creature-collector', 'bonk-a-brainrot']],
   ]},
   { group: 'Everything else', items: [
-    ['Python', ['bigger-card-images', 'boba-and-aloe', 'study-cat-mac', 'ad-factory']],
+    ['Python', ['bigger-card-images', 'boba-and-aloe', 'study-cat-mac', 'ad-factory', 'toothid', 'agent', 'meme-mirror']],
     ['Qt', ['bigger-card-images', 'study-cat-mac', 'boba-and-aloe']],
     ['Claude API', ['boba-and-aloe', 'boba-3d', 'study-cat-mac']],
     ['Blender', ['boba-3d']],
     ['On device ML', ['written-in-real-stars']],
     ['ffmpeg', ['ad-factory']],
+    ['3D meshes', ['toothid', 'boba-3d']],
   ]},
 ];
 

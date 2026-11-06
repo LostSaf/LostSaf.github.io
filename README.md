@@ -8,8 +8,8 @@ The portfolio is a building. It starts as a black lacquer screen; click and it s
 | 7 Studio | Written in Real Stars, The Ad Factory |
 | 6 Lab | Earshot, Screen Translator, Live Page Translator, Doc Preview to PDF, Agent, Meme Mirror, ArtificialPersona |
 | 5 Arcade | Tides of Qingdao, Bonk a Brainrot, Creature Collector, Monsters in the Office, CandieZ |
-| 4 Study | Boba & Aloe, Boba in 3D, Study Cat for Mac, Bigger Card Images |
-| 3 Gifts | Sites made for my girlfriend |
+| 4 Study | Boba & Aloe, Boba in 3D, Study Cat for Mac, Bigger Card Images, ToothID |
+| 3 Gifts | Sites made for my girlfriend: the Girlfriend's Day card, alone, and where Written in Real Stars began |
 | 2 Atelier | Fashion shoots, with a fitting room for little Me |
 | 1 Workshop | Skills. Click one and the building lights up where it was used |
 | G Mailroom | Email, LinkedIn, GitHub, print the CV, older repos |
@@ -19,6 +19,7 @@ The demos are real wherever they can be:
 - **Tides of Qingdao:** real gameplay clips cut from a Studio recording, the wok station ported from `Wok.luau` and graded like `server/Cooking.luau`, and catch rolls ported from `Rarity.luau`.
 - **Creature Collector:** the catch ring ported from the shared `Catch.luau`, with the server's real checks and limits.
 - **Boba & Aloe, Boba 3D:** the add-ons' own `cats.js`, `boba.js` and CSS, and the Blender sprite sheet, running in a pretend reviewer (`media/anki/reviewer.html`) that plays Anki's bridge with one saved answer.
+- **ToothID** and **alone:** the real apps (`media/toothid`, `media/alone`). ToothID runs on Patient A's 26 teeth from 3Dentes (CC BY-NC 4.0), credited on its page and in the app.
 - **Earshot:** the real app. Its bundled notes are swapped for three sample lectures (`media/earshot/index.html`), so nothing private ships.
 - **Written in Real Stars:** 2,035 stars from the site's own catalogue, and real product photos. **Ad Factory:** three real ads.
 

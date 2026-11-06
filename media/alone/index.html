@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>alone</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;}
+  body{cursor:none;}
+  canvas{display:block;position:fixed;inset:0;width:100%;height:100%;}
+  #hint{
+    position:fixed;left:50%;bottom:7vh;transform:translateX(-50%);
+    color:rgba(255,255,255,.28);
+    font:300 12px/1 ui-serif,Georgia,"Times New Roman",serif;
+    letter-spacing:.42em;pointer-events:none;opacity:1;
+    transition:opacity 2s ease,color 2s ease;
+  }
+  #hint.gone{opacity:0}
+  #hint.day{color:rgba(38,52,26,.5)}
+  @media (prefers-reduced-motion: reduce){#hint{transition:none}}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="hint">move the light</div>
+<script>
+(() => {
+  const view = document.getElementById('view');
+  const ctx  = view.getContext('2d');
+  const hint = document.getElementById('hint');
+
+  const mk = () => { const c = document.createElement('canvas'); return { c, x: c.getContext('2d') }; };
+  const bg = mk(), bgFore = mk(), bgDay = mk(), bgDayFore = mk();
+  const shadow = mk(), soft = mk(), light = mk(), wordL = mk(), tmp = mk(), figL = mk();
+  const all = [bg, bgFore, bgDay, bgDayFore, shadow, soft, light, wordL, tmp, figL];
+
+  let W = 0, H = 0, DPR = 1, DIAG = 0;
+  let mx = 0, my = 0, lx = 0, ly = 0;
+  let lookEase = 0;
+  let moved = false;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const cl   = (v, a, b) => Math.max(a, Math.min(b, v));
+  const c01  = v => cl(v, 0, 1);
+  const sm   = v => { v = c01(v); return v * v * (3 - 2 * v); };
+
+  /* ---------------- story state ---------------- */
+  const T = { dark: 2.2, walkEnd: 8.0, hugEnd: 9.7, bloomEnd: 12.8, dayEnd: 17.6 };
+  let mode = 'night';     // night | story | held
+  let st = 0, hold = 0, lockout = false, heldFor = 0;
+  let travel = 0, prevGx = null;
+
+  /* ---------------- deterministic field ---------------- */
+  function rng(seed) {
+    let s = seed | 0;
+    return () => { s = (s * 1664525 + 1013904223) | 0; return (s >>> 0) / 4294967296; };
+  }
+
+  const PETALS = ['#e23b4e','#f0913a','#f6df6a','#ec6fa6','#a172ec','#fdfaf2','#ff7f5e','#79cfe6','#d94f7a','#ffd166'];
+
+  function paintField(g, gf, day) {
+    const R = rng(778821);
+    const horizon = H * 0.455;
+
+    const sky = g.createLinearGradient(0, 0, 0, horizon);
+    if (day) {
+      sky.addColorStop(0, '#6db4e8');
+      sky.addColorStop(0.55, '#a7d6f2');
+      sky.addColorStop(1, '#f3e3c2');
+    } else {
+      sky.addColorStop(0, '#0d1526');
+      sky.addColorStop(0.55, '#24203c');
+      sky.addColorStop(1, '#5b3c4a');
+    }
+    g.fillStyle = sky; g.fillRect(0, 0, W, horizon + 1);
+
+    for (let i = 0; i < 260; i++) {
+      const x = R() * W, y = R() * horizon * 0.92, r = R() * 1.2 + 0.2, a = R();
+      if (day) continue;
+      g.fillStyle = `rgba(255,246,228,${0.06 + a * 0.3})`;
+      g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
+    }
+
+    if (day) {
+      const R2 = rng(4412);
+      for (let i = 0; i < 16; i++) {
+        const x = R2() * W * 1.1 - W * 0.05, y = R2() * horizon * 0.55, s = 40 + R2() * 120;
+        g.fillStyle = `rgba(255,255,255,${0.32 + R2() * 0.3})`;
+        for (let k = 0; k < 5; k++) {
+          g.beginPath();
+          g.ellipse(x + (k - 2) * s * 0.42, y + Math.sin(k) * s * 0.12, s * 0.5, s * 0.26, 0, 0, 6.2832);
+          g.fill();
+        }
+      }
+    }
+
+    g.fillStyle = day ? '#3f6b3c' : '#131c18';
+    g.beginPath(); g.moveTo(0, horizon + 4);
+    for (let x = 0; x <= W; x += 14) {
+      const h = 16 + Math.sin(x * 0.013) * 9 + R() * 22;
+      g.lineTo(x, horizon - h);
+    }
+    g.lineTo(W, horizon + 4); g.closePath(); g.fill();
+
+    const soil = g.createLinearGradient(0, horizon, 0, H);
+    if (day) {
+      soil.addColorStop(0, '#6f9e47');
+      soil.addColorStop(0.45, '#8dbc53');
+      soil.addColorStop(1, '#4f7a33');
+    } else {
+      soil.addColorStop(0, '#2b4127');
+      soil.addColorStop(0.45, '#3d5a2e');
+      soil.addColorStop(1, '#1b2a16');
+    }
+    g.fillStyle = soil; g.fillRect(0, horizon - 2, W, H - horizon + 2);
+
+    const depth = H - horizon;
+
+    /* anything rooted below the line they stand on is nearer than they are,
+       so it goes to the front layer and grows up over their feet */
+    const pick = y => (y > feetY ? gf : g);
+
+    g.lineCap = 'round'; gf.lineCap = 'round';
+    const blade = (c, x, y, s) => {
+      const len = (10 + R() * 26) * s;
+      const lean = (R() - 0.5) * 22 * s;
+      const hue = 88 + R() * 34, sat = 26 + R() * 26, li = 14 + R() * 10;
+      c.strokeStyle = `hsl(${hue} ${sat + (day ? 16 : 0)}% ${li + (y - horizon) / depth * 22 + (day ? 26 : 0)}%)`;
+      c.lineWidth = Math.max(0.5, 1.5 * s);
+      c.beginPath(); c.moveTo(x, y);
+      c.quadraticCurveTo(x + lean * 0.4, y - len * 0.6, x + lean, y - len);
+      c.stroke();
+    };
+
+    for (let i = 0; i < 4200; i++) {
+      const t = Math.pow(R(), 0.65);
+      const y = horizon + t * depth, x = R() * W;
+      blade(pick(y), x, y, 0.18 + t * 1.5);
+    }
+
+    /* a thicket right where they stand, so their feet sit down inside it */
+    for (let i = 0; i < 900; i++) {
+      const x = cx + (R() - 0.5) * figH * 1.5;
+      const y = feetY + (R() * R()) * (H - feetY) * 0.8 + 2;
+      blade(gf, x, y, 1.15 + R() * 0.55);
+    }
+
+    for (let i = 0; i < 300; i++) {
+      const t = Math.pow(R(), 0.55);
+      const y = horizon + 6 + t * depth * 0.99, x = R() * W;
+      const s = 0.2 + t * 1.55;
+      bloom(pick(y), x, y, (4.5 + R() * 5) * s, PETALS[(R() * PETALS.length) | 0], R, s, day);
+    }
+
+    for (let i = 0; i < 70; i++) {
+      const x = cx + (R() - 0.5) * figH * 1.7;
+      const y = feetY + (R() * R()) * (H - feetY) * 0.85 + 4;
+      bloom(gf, x, y, (7 + R() * 6) * 1.3, PETALS[(R() * PETALS.length) | 0], R, 1.3, day);
+    }
+
+    for (let i = 0; i < 420; i++) {
+      const t = Math.pow(R(), 0.5);
+      const y = horizon + t * depth, x = R() * W, a = R(), r = R();
+      const c = pick(y);
+      c.fillStyle = `rgba(255,${day ? 255 : 243},${day ? 236 : 206},${0.08 + a * 0.35})`;
+      c.beginPath(); c.arc(x, y, 0.4 + r * 1.5 * (0.3 + t), 0, 6.2832); c.fill();
+    }
+  }
+
+  function bloom(g, x, y, r, color, R, s, day) {
+    const hue = 96 + R() * 22;
+    g.strokeStyle = `hsl(${hue} ${day ? 46 : 30}% ${(day ? 34 : 16) + s * 12}%)`;
+    g.lineWidth = Math.max(0.7, r * 0.2);
+    g.beginPath();
+    g.moveTo(x, y + r * 5.4);
+    g.quadraticCurveTo(x + r * (R() - 0.5) * 2.2, y + r * 2.2, x, y);
+    g.stroke();
+
+    const n = 5 + ((R() * 3) | 0), rot = R() * 6.2832;
+    for (let i = 0; i < n; i++) {
+      const a = rot + (i / n) * 6.2832;
+      const jitter = R();
+      g.fillStyle = color;
+      g.globalAlpha = day ? 0.92 + jitter * 0.08 : 0.78 + jitter * 0.22;
+      g.beginPath();
+      g.ellipse(x + Math.cos(a) * r * 0.62, y + Math.sin(a) * r * 0.62, r * 0.62, r * 0.36, a, 0, 6.2832);
+      g.fill();
+    }
+    g.globalAlpha = 1;
+    g.fillStyle = day ? '#fff3bd' : '#ffe9a8';
+    g.beginPath(); g.arc(x, y, r * 0.34, 0, 6.2832); g.fill();
+  }
+
+  /* ---------------- the figure ---------------- */
+  /* 7.6 heads tall. Landmarks: chin .868, shoulder .808, waist .622,
+     crotch .478, knee .266, ankle .046: right half, mirrored. */
+  const HALF = [
+    [0.034,0.880],[0.072,0.845],[0.112,0.808],[0.136,0.776],[0.137,0.720],
+    [0.130,0.648],[0.120,0.556],[0.111,0.452],[0.107,0.398],[0.086,0.390],
+    [0.088,0.452],[0.094,0.556],[0.100,0.648],[0.106,0.720],[0.099,0.766],
+    [0.085,0.712],[0.076,0.622],[0.088,0.540],[0.096,0.472],[0.092,0.398],
+    [0.078,0.318],[0.066,0.266],[0.070,0.198],[0.058,0.108],[0.049,0.046],
+    [0.060,0.008],[0.088,0.000],[0.016,0.000],[0.025,0.046],[0.031,0.140],
+    [0.034,0.262],[0.029,0.360],[0.020,0.432]
+  ];
+  const BODY = HALF.concat([[0, 0.478]], HALF.map(q => [-q[0], q[1]]).reverse());
+  const MHEAD_R = 0.066, MHEAD_Y = 0.934;
+
+  let figH = 0, cx = 0, feetY = 0;
+
+  function buildFigure(t, calm) {
+    const breath = reduced ? 0 : Math.sin(t * 0.9) * 0.0035 * (1 - calm * 0.4);
+    const sway   = reduced ? 0 : (Math.sin(t * 0.37) * 0.012 + Math.sin(t * 0.13) * 0.008) * (1 - calm);
+    const h = figH * (1 + breath);
+    const ca = Math.cos(sway), sa = Math.sin(sway);
+
+    const place = (px, py) => {
+      const rx = px * ca - py * sa, ry = px * sa + py * ca;
+      return [cx + rx * h, feetY - ry * h];
+    };
+
+    const body = BODY.map(p => place(p[0], p[1]));
+
+    const hx = lookEase * 0.022;
+    const hy = MHEAD_Y + Math.sin(t * 0.9) * 0.004;
+    const hr = MHEAD_R;
+    const head = [];
+    for (let i = 0; i < 22; i++) {
+      const a = (i / 22) * 6.2832;
+      head.push(place(hx + Math.cos(a) * hr * 0.98, hy + Math.sin(a) * hr));
+    }
+    return [body, head];
+  }
+
+  /* ---------------- shadow volumes ---------------- */
+  function signedArea(p) {
+    let s = 0;
+    for (let i = 0; i < p.length; i++) {
+      const a = p[i], b = p[(i + 1) % p.length];
+      s += a[0] * b[1] - b[0] * a[1];
+    }
+    return s * 0.5;
+  }
+
+  function addPoly(g, p) {
+    const pts = signedArea(p) < 0 ? p.slice().reverse() : p;
+    g.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+    g.closePath();
+  }
+
+  function project(p, sx, sy) {
+    const dx = p[0] - sx, dy = p[1] - sy;
+    const d = Math.hypot(dx, dy) || 0.0001;
+    return [p[0] + (dx / d) * DIAG, p[1] + (dy / d) * DIAG];
+  }
+
+  function castShadow(g, polys, sx, sy) {
+    g.beginPath();
+    for (const poly of polys) {
+      for (let i = 0; i < poly.length; i++) {
+        const a = poly[i], b = poly[(i + 1) % poly.length];
+        addPoly(g, [a, b, project(b, sx, sy), project(a, sx, sy)]);
+      }
+      addPoly(g, poly);
+    }
+    g.fill();
+  }
+
+  function inside(pt, poly) {
+    let hit = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[i], b = poly[j];
+      if ((a[1] > pt[1]) !== (b[1] > pt[1]) &&
+          pt[0] < (b[0] - a[0]) * (pt[1] - a[1]) / (b[1] - a[1]) + a[0]) hit = !hit;
+    }
+    return hit;
+  }
+
+  function inflate(poly, k) {
+    const ox = cx, oy = feetY - figH * 0.45;
+    return poly.map(p => [ox + (p[0] - ox) * k, oy + (p[1] - oy) * k]);
+  }
+
+  /* ---------------- one light ---------------- */
+  function addLight(x, y, radius, alpha, polys, shadowAlpha) {
+    if (alpha <= 0.003) return;
+
+    if (shadowAlpha > 0.003) {
+      const S = shadow.x;
+      S.clearRect(0, 0, W, H);
+      S.fillStyle = '#fff';
+      castShadow(S, polys, x, y);
+      const F = soft.x;
+      F.clearRect(0, 0, W, H);
+      F.filter = 'blur(2.5px)';
+      F.drawImage(shadow.c, 0, 0, W, H);
+      F.filter = 'none';
+    } else {
+      soft.x.clearRect(0, 0, W, H);
+    }
+
+    const A = tmp.x;
+    A.globalCompositeOperation = 'source-over';
+    A.globalAlpha = 1;
+    A.clearRect(0, 0, W, H);
+    const gr = A.createRadialGradient(x, y, 0, x, y, Math.max(8, radius));
+    gr.addColorStop(0.00, 'rgba(255,237,207,1)');
+    gr.addColorStop(0.30, 'rgba(255,229,190,0.94)');
+    gr.addColorStop(0.58, 'rgba(255,217,172,0.58)');
+    gr.addColorStop(0.82, 'rgba(255,206,160,0.20)');
+    gr.addColorStop(1.00, 'rgba(255,200,152,0)');
+    A.fillStyle = gr; A.fillRect(0, 0, W, H);
+
+    if (shadowAlpha > 0.003) {
+      A.globalCompositeOperation = 'destination-out';
+      A.globalAlpha = shadowAlpha;
+      A.drawImage(soft.c, 0, 0, W, H);
+      A.globalAlpha = 1;
+      A.globalCompositeOperation = 'source-over';
+    }
+
+    const L = light.x;
+    L.globalCompositeOperation = 'lighter';
+    L.globalAlpha = alpha;
+    L.drawImage(tmp.c, 0, 0, W, H);
+    L.globalAlpha = 1;
+    L.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---------------- what lives in the dark ---------------- */
+  const WORDS = [
+    'alone','no one is coming','i miss you','empty','hollow','unheard','too much','not enough',
+    'forgotten','tired','unseen','afraid','still here','again','quiet','heavy','numb','left behind',
+    'nothing','small','aching','distant','invisible','waiting','missed','the same day','please','stay',
+    'i tried','say something','nobody asked','it never stops','remember me','breathe','unanswered','late'
+  ];
+
+  const items = [];
+  function reseed(w, first) {
+    w.text  = WORDS[(Math.random() * WORDS.length) | 0];
+    w.x     = Math.random() * W;
+    w.y     = Math.random() * H;
+    w.size  = 13 + Math.random() * 30;
+    w.dur   = 5 + Math.random() * 8;
+    w.life  = first ? Math.random() * w.dur : 0;
+    w.vx    = (Math.random() - 0.5) * 5;
+    w.vy    = -(2 + Math.random() * 7);
+    w.peak  = 0.4 + Math.random() * 0.55;
+    w.track = 1 + Math.random() * 5;
+    w.slant = Math.random() < 0.28;
+  }
+  for (let i = 0; i < 38; i++) { const w = {}; reseed(w, true); items.push(w); }
+
+  function paintWords(g, dt, gain) {
+    g.globalCompositeOperation = 'source-over';
+    g.clearRect(0, 0, W, H);
+    if (gain <= 0.004) return;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    for (const w of items) {
+      w.life += dt;
+      if (w.life > w.dur) { reseed(w, false); continue; }
+      w.x += w.vx * dt; w.y += w.vy * dt;
+      const t = w.life / w.dur;
+      const a = Math.pow(Math.sin(Math.PI * t), 1.4) * w.peak * gain;
+      if (a <= 0.004) continue;
+      g.globalAlpha = Math.min(1, a);
+      g.font = `${w.slant ? 'italic ' : ''}300 ${w.size}px ui-serif, Georgia, "Times New Roman", serif`;
+      try { g.letterSpacing = `${w.track}px`; } catch (e) {}
+      g.fillStyle = '#ffffff';
+      g.fillText(w.text, w.x, w.y);
+    }
+    g.globalAlpha = 1;
+  }
+
+  /* ---------------- her ----------------
+     Foot-planted walk rig. The stance foot is fixed in world space and the
+     body travels over it, so nothing slides. Knees come from two-bone IK.
+     Hips ride lowest at contact and highest at passing, per Williams.     */
+  const G = { step:0.325, thigh:0.248, shin:0.232, torso:0.384,
+              upper:0.190, fore:0.163, headR:0.064, footL:0.072, ankle:0.020 };
+
+  function footAngle(fr) {
+    if (fr < 0.08) return -0.38 * (1 - fr / 0.08);
+    if (fr < 0.42) return 0;
+    if (fr < 0.60) return 0.66 * sm((fr - 0.42) / 0.18);
+    const s = (fr - 0.6) / 0.4;
+    return 0.66 * (1 - sm(Math.min(1, s / 0.45))) - 0.38 * sm(Math.max(0, (s - 0.6) / 0.4));
+  }
+
+  function ik(hip, foot, l1, l2, fwd) {
+    const dx = foot[0] - hip[0], dy = foot[1] - hip[1];
+    const d = Math.hypot(dx, dy) || 1e-6;
+    const ux = dx / d, uy = dy / d;
+    const dc = Math.min(d, (l1 + l2) * 0.999);
+    const a = (l1 * l1 - l2 * l2 + dc * dc) / (2 * dc);
+    const hh = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+    let px = -uy, py = ux;
+    if (px * fwd < 0) { px = -px; py = -py; }
+    return [hip[0] + ux * a + px * hh, hip[1] + uy * a + py * hh];
+  }
+
+  function girlPose(h, travel, bx, dir, stand, hug) {
+    const S = G.step * h, L1 = G.thigh * h, L2 = G.shin * h, LEG = L1 + L2;
+    const maxH = LEG * 0.985, AN = G.ankle * h;
+    const hmin = AN + Math.sqrt(maxH * maxH - Math.pow(0.6 * S, 2));
+    const cyc = travel / (2 * S);
+
+    const feet = [];
+    for (let i = 0; i < 2; i++) {
+      const fr = ((cyc + 0.5 * i) % 1 + 1) % 1;
+      let lx, lift = 0, swing = null;
+      if (fr < 0.6) {
+        lx = 0.6 * S - (fr / 0.6) * 1.2 * S;
+      } else {
+        const s = (fr - 0.6) / 0.4; swing = s;
+        lx = -0.6 * S + sm(s) * 1.2 * S;
+        lift = 0.088 * h * Math.pow(Math.sin(Math.PI * Math.pow(s, 0.82)), 0.9) * (1 - 0.28 * s);
+      }
+      feet.push({ fr, lx, lift, swing, ang: footAngle(fr) });
+    }
+
+    let hraw = Infinity;
+    for (const f of feet) if (f.swing === null)
+      hraw = Math.min(hraw, AN + Math.sqrt(Math.max(1, maxH * maxH - f.lx * f.lx)));
+    if (!isFinite(hraw)) hraw = hmin;
+    let hipH = hmin + (hraw - hmin) * 0.55;
+
+    let rec = 0;
+    for (const f of feet) if (f.fr < 0.22) rec = Math.max(rec, Math.sin(Math.PI * f.fr / 0.22));
+    hipH -= 0.012 * h * rec;
+
+    if (stand > 0) {
+      for (let i = 0; i < 2; i++) {
+        const f = feet[i], tgt = (i === 0 ? -0.042 : 0.034) * h;
+        f.lx += (tgt - f.lx) * stand;
+        f.lift *= (1 - stand);
+        f.ang  *= (1 - stand);
+      }
+      hipH += (AN + LEG * 0.962 - hipH) * stand;
+    }
+
+    const pelvis = [bx, feetY - hipH];
+    const lean = 0.060 * (1 - stand);
+    const neck = [pelvis[0] + dir * Math.sin(lean) * G.torso * h,
+                  pelvis[1] - Math.cos(lean) * G.torso * h];
+    const head = [neck[0] + dir * 0.022 * h, neck[1] - 0.052 * h];
+
+    const legs = [];
+    for (let i = 0; i < 2; i++) {
+      const hip = [pelvis[0] + dir * 0.010 * h * (i === 0 ? 1 : -1), pelvis[1]];
+      const ank = [bx + dir * feet[i].lx, feetY - feet[i].lift - AN];
+      legs.push([hip, ik(hip, ank, L1, L2, dir), ank]);
+    }
+
+    /* arms: swing by FK, then the hand is pulled to a wrap target and the
+       elbow re-solved by IK, so the limb never stretches mid-transition */
+    const arms = [];
+    const wrap = [[cx + 0.014 * figH, feetY - 0.640 * figH],
+                  [cx - 0.050 * figH, feetY - 0.685 * figH]];
+    for (let i = 0; i < 2; i++) {
+      const sw = feet[i].lx / (0.6 * S);
+      const th = -0.34 * sw * (1 - stand);
+      const bend = (0.16 + 0.34 * Math.max(0, -sw)) * (1 - stand) + 0.20 * stand;
+      const sh = [neck[0] - dir * 0.004 * h, neck[1] + 0.052 * h];
+      const ex = sh[0] + dir * Math.sin(th) * G.upper * h;
+      const ey = sh[1] + Math.cos(th) * G.upper * h;
+      const t2 = th + bend;
+      let hd = [ex + dir * Math.sin(t2) * G.fore * h, ey + Math.cos(t2) * G.fore * h];
+      if (hug > 0.0005) hd = [hd[0] + (wrap[i][0] - hd[0]) * hug,
+                              hd[1] + (wrap[i][1] - hd[1]) * hug];
+      arms.push([sh, ik(sh, hd, G.upper * h, G.fore * h, 1), hd]);
+    }
+
+    return { pelvis, neck, head, legs, arms, feet, dir, h };
+  }
+
+  /* She is built solid on her own layer first, so each part genuinely covers
+     the one behind it, then that layer is composited once with a single glow.
+     Drawing her limb by limb straight to the scene made every joint translucent
+     and every overlap read as a seam. Three flat tones carry the depth instead
+     of three alphas: near limb, body, far limb. */
+  const TONE = { near: 'rgb(255,253,245)', core: 'rgb(231,229,221)', far: 'rgb(176,174,166)' };
+
+  function chain(g, pts, w, col) {
+    g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+    g.stroke();
+  }
+
+  function shape(g, build, col) {
+    g.fillStyle = col; g.beginPath(); build(g); g.closePath(); g.fill();
+  }
+
+  function footShape(g, P, i, col, thick) {
+    const h = P.h, dir = P.dir, ank = P.legs[i][2], ang = P.feet[i].ang;
+    const hx = ank[0] - dir * 0.016 * h, hy = ank[1] + 0.020 * h;
+    const tx = ank[0] + dir * Math.cos(ang) * G.footL * h;
+    const ty = ank[1] + 0.020 * h - Math.sin(ang) * G.footL * h;
+    shape(g, gg => {
+      gg.moveTo(hx, hy - 0.024 * h); gg.lineTo(hx, hy);
+      gg.lineTo(tx, ty); gg.lineTo(tx, ty - thick * h);
+    }, col);
+  }
+
+  /* shoulders to hem in one unbroken curve */
+  function girlShape(g, P) {
+    const h = P.h, d = P.dir;
+    const px = P.pelvis[0], py = P.pelvis[1], nx = P.neck[0], ny = P.neck[1];
+    const sway = d * (P.legs[0][2][0] - px) * 0.13;
+    const hem = py + 0.150 * h;
+    g.moveTo(nx - 0.055 * h, ny + 0.020 * h);
+    g.quadraticCurveTo(nx - 0.063 * h, ny + 0.170 * h, px - 0.044 * h, py - 0.080 * h);
+    g.quadraticCurveTo(px - 0.066 * h, py + 0.020 * h, px - 0.112 * h + sway, hem);
+    g.quadraticCurveTo(px + 0.006 * h + sway, hem + 0.046 * h, px + 0.124 * h + sway, hem);
+    g.quadraticCurveTo(px + 0.068 * h, py + 0.020 * h, px + 0.044 * h, py - 0.080 * h);
+    g.quadraticCurveTo(nx + 0.063 * h, ny + 0.170 * h, nx + 0.055 * h, ny + 0.020 * h);
+    g.quadraticCurveTo(nx, ny + 0.062 * h, nx - 0.055 * h, ny + 0.020 * h);
+  }
+
+  /* falls over the shoulders and swallows the neck join */
+  function girlHair(g, P) {
+    const h = P.h, R = G.headR * h, b = -P.dir;
+    const hx = P.head[0], hy = P.head[1];
+    g.moveTo(hx - b * 0.016 * h, hy - R * 0.92);
+    g.quadraticCurveTo(hx + b * 0.058 * h, hy - R * 1.28, hx + b * 0.076 * h, hy - R * 0.05);
+    g.quadraticCurveTo(hx + b * 0.090 * h, hy + R * 1.70, hx + b * 0.052 * h, hy + R * 3.10);
+    g.quadraticCurveTo(hx + b * 0.016 * h, hy + R * 2.85, hx - b * 0.010 * h, hy + R * 2.35);
+    g.quadraticCurveTo(hx - b * 0.030 * h, hy + R * 1.20, hx - b * 0.016 * h, hy - R * 0.92);
+  }
+
+  /* legs go down before the skirt goes on, so only what clears the hem shows */
+  function girlLayer(P, part) {
+    const g = figL.x, h = P.h;
+    g.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1;
+    g.clearRect(0, 0, W, H);
+
+    if (part === 'arm') { chain(g, P.arms[0], 0.036 * h, TONE.near); return; }
+
+    chain(g, P.legs[1], 0.040 * h, TONE.far);
+    footShape(g, P, 1, TONE.far, 0.014);
+    chain(g, P.arms[1], 0.032 * h, TONE.far);
+
+    chain(g, P.legs[0], 0.045 * h, TONE.near);
+    footShape(g, P, 0, TONE.near, 0.016);
+
+    const nx = P.neck[0], ny = P.neck[1];
+    chain(g, [[nx, ny + 0.060 * h], [nx + P.dir * 0.010 * h, ny - 0.030 * h]], 0.030 * h, TONE.core);
+
+    shape(g, gg => girlShape(gg, P), TONE.core);
+    shape(g, gg => girlHair(gg, P), TONE.core);
+
+    const R = G.headR * h;
+    g.fillStyle = TONE.near;
+    g.beginPath(); g.ellipse(P.head[0], P.head[1], R * 0.94, R, 0, 0, 6.2832); g.fill();
+  }
+
+  function girlBox(P, pad) {
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    const add = q => { x0 = Math.min(x0, q[0]); y0 = Math.min(y0, q[1]);
+                       x1 = Math.max(x1, q[0]); y1 = Math.max(y1, q[1]); };
+    for (const L of P.legs) L.forEach(add);
+    for (const A of P.arms) A.forEach(add);
+    add(P.pelvis); add(P.neck); add(P.head);
+    add([P.pelvis[0], P.pelvis[1] + 0.20 * P.h]);
+    return [x0 - pad, y0 - pad, x1 + pad, y1 + pad];
+  }
+
+  /* one composite, one glow, clipped to her so the blur stays cheap */
+  function blitGirl(P, alpha) {
+    const bx = girlBox(P, 0.22 * P.h);
+    const x = Math.max(0, bx[0]), y = Math.max(0, bx[1]);
+    const w = Math.min(W, bx[2]) - x, hh = Math.min(H, bx[3]) - y;
+    if (w <= 0 || hh <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = `rgba(255,246,222,${0.85 * alpha})`;
+    ctx.shadowBlur = 26;
+    ctx.drawImage(figL.c, x * DPR, y * DPR, w * DPR, hh * DPR, x, y, w, hh);
+    ctx.restore();
+  }
+
+  /* ---------------- layout ---------------- */
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 1.35);
+    W = window.innerWidth; H = window.innerHeight;
+    DIAG = Math.hypot(W, H) * 2.2;
+    for (const L of all) {
+      L.c.width = Math.round(W * DPR); L.c.height = Math.round(H * DPR);
+      L.x.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    view.width = Math.round(W * DPR); view.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    figH  = Math.min(H * 0.42, W * 0.62);
+    cx    = W * 0.5;
+    feetY = H * 0.84;
+
+    if (!moved) { mx = lx = W * 0.5; my = ly = H * 0.20; }
+    for (const L of [bg, bgFore, bgDay, bgDayFore]) L.x.clearRect(0, 0, W, H);
+    paintField(bg.x, bgFore.x, false);
+    paintField(bgDay.x, bgDayFore.x, true);
+  }
+
+  /* ---------------- input ---------------- */
+  function point(x, y) {
+    mx = x; my = y;
+    if (!moved) { moved = true; lx = mx; ly = my; hint.classList.add('gone'); }
+  }
+  addEventListener('pointermove', e => point(e.clientX, e.clientY), { passive: true });
+  addEventListener('touchmove', e => { const t = e.touches[0]; if (t) point(t.clientX, t.clientY); }, { passive: true });
+  addEventListener('resize', resize);
+  addEventListener('pointerdown', () => {
+    if (mode !== 'held') return;
+    mode = 'night'; st = 0; hold = 0; heldFor = 0; lockout = true;
+    travel = 0; prevGx = null;
+    hint.classList.add('gone'); hint.classList.remove('day');
+    for (const w of items) reseed(w, true);
+  });
+
+  /* ---------------- frame ---------------- */
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now; const t = now / 1000;
+
+    if (mode === 'story') st = Math.min(st + dt, T.dayEnd);
+    if (mode === 'held')  heldFor += dt;
+
+    /* story curves */
+    const story    = mode !== 'night';
+    const walkT    = story ? sm((st - 0.9) / (T.walkEnd - 0.9)) : 0;
+    const hugT     = story ? sm((st - T.walkEnd) / (T.hugEnd - T.walkEnd)) : 0;
+    const whiteT   = story ? sm((st - T.hugEnd) / (T.bloomEnd - T.hugEnd)) : 0;
+    const dayT     = story ? sm((st - T.bloomEnd) / (T.dayEnd - T.bloomEnd)) : 0;
+    const cursorA  = story ? c01(1 - st / 1.5) : 1;
+    const girlA    = story ? c01((st - 1.0) / 1.4) : 0;
+    const swell    = story ? Math.pow(Math.sin(Math.PI * c01(st / T.dark)), 0.8) : 0;
+    const wordGain = story ? (1 + swell * 0.7) * (1 - sm((st - T.dark) / (T.hugEnd - T.dark))) : 1;
+    const calm     = Math.max(hugT, whiteT);
+
+    /* light follows the pointer, or locks into him once the story runs */
+    if (story) { mx = cx; my = feetY - figH * 0.66; }
+    lx += (mx - lx) * Math.min(1, dt * (story ? 3 : 9));
+    ly += (my - ly) * Math.min(1, dt * (story ? 3 : 9));
+
+    /* where he looks */
+    const wander = Math.sin(t * 0.21) * 0.45 + Math.sin(t * 0.07) * 0.3;
+    let lookTarget;
+    if (!story)            lookTarget = cl((lx - cx) / (W * 0.42), -1, 1) * 0.75 + wander * 0.25;
+    else if (st < T.dark)  lookTarget = wander * 1.3;
+    else if (st < T.walkEnd) lookTarget = 0.95;
+    else                   lookTarget = 0.25;
+    lookEase += (lookTarget - lookEase) * Math.min(1, dt * 2.4);
+
+    const polys = buildFigure(t, calm);
+
+    /* trigger: the light goes behind him and everything closes over */
+    if (mode === 'night') {
+      const on = inside([lx, ly], inflate(polys[0], 1.28)) || inside([lx, ly], inflate(polys[1], 1.28));
+      if (!on) lockout = false;
+      hold = (on && !lockout) ? hold + dt : 0;
+      if (hold > 0.85) { mode = 'story'; st = 0; hold = 0; }
+    } else if (mode === 'story' && st >= T.dayEnd) {
+      mode = 'held'; heldFor = 0;
+    }
+
+    /* her position: the gait is driven by distance walked, never by a timer,
+       which is what keeps the planted foot from sliding */
+    const girlH = figH * 1.10;
+    const gx = W * 1.12 + (cx + figH * 0.13 - W * 1.12) * walkT;
+    if (prevGx === null) prevGx = gx;
+    travel += Math.abs(gx - prevGx);
+    prevGx = gx;
+    const stand = Math.max(hugT, sm((walkT - 0.9) / 0.1));
+    const P = girlPose(girlH, travel, gx, -1, stand, hugT);
+    const girlLightR = figH * (0.95 + 0.9 * whiteT + 3.2 * dayT);
+
+    /* ---- lights ---- */
+    const L = light.x;
+    L.globalCompositeOperation = 'source-over';
+    L.globalAlpha = 1;
+    L.clearRect(0, 0, W, H);
+
+    const shadowStrength = c01(1 - Math.max(hugT * 0.85, whiteT));
+
+    paintWords(wordL.x, dt, wordGain);
+
+    // his shadow from your light, and the words that live inside it
+    addLight(lx, ly, Math.max(250, Math.min(W, H) * 0.46) *
+             (reduced ? 1 : 1 + Math.sin(t * 2.1) * 0.018 + Math.sin(t * 5.7) * 0.011),
+             cursorA, polys, 1);
+    wordL.x.globalCompositeOperation = 'destination-in';
+    wordL.x.drawImage(soft.c, 0, 0, W, H);
+    wordL.x.globalCompositeOperation = 'source-over';
+
+    // hers
+    if (girlA > 0.003) {
+      addLight(P.neck[0], P.neck[1] + girlH * 0.08, girlLightR, girlA, polys, shadowStrength);
+    }
+
+    // words only survive where it is still dark
+    wordL.x.globalCompositeOperation = 'destination-out';
+    wordL.x.drawImage(light.c, 0, 0, W, H);
+    wordL.x.globalCompositeOperation = 'source-over';
+
+    /* ---- compose ---- */
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+
+    const A = tmp.x;
+    A.globalCompositeOperation = 'source-over';
+    A.globalAlpha = 1;
+    A.clearRect(0, 0, W, H);
+    A.drawImage(bg.c, 0, 0, W, H);
+    A.globalCompositeOperation = 'destination-in';
+    A.drawImage(light.c, 0, 0, W, H);
+    A.globalCompositeOperation = 'source-over';
+    ctx.drawImage(tmp.c, 0, 0, W, H);
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.11;
+    ctx.drawImage(light.c, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.drawImage(wordL.c, 0, 0, W, H);
+
+    // daylight washes the dark out entirely
+    if (dayT > 0.002) {
+      ctx.globalAlpha = dayT;
+      ctx.drawImage(bgDay.c, 0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
+
+    // her, behind him
+    if (girlA > 0.003) { girlLayer(P, 'body'); blitGirl(P, girlA); }
+
+    // him
+    ctx.save();
+    if (whiteT > 0.002) {
+      ctx.shadowColor = `rgba(255,246,216,${0.75 * whiteT})`;
+      ctx.shadowBlur = 70 * whiteT;
+      ctx.fillStyle = '#fffdf4';
+      ctx.beginPath(); for (const p of polys) addPoly(ctx, p); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); for (const p of polys) addPoly(ctx, p); ctx.fill();
+    if (whiteT > 0.002) {
+      ctx.clip();
+      const hx = cx, hy = feetY - figH * 0.68;
+      const r = Math.max(2, figH * 1.45 * whiteT);
+      const gg = ctx.createRadialGradient(hx, hy, 0, hx, hy, r);
+      gg.addColorStop(0.00, 'rgba(255,255,255,1)');
+      gg.addColorStop(0.68, 'rgba(255,252,240,0.99)');
+      gg.addColorStop(1.00, 'rgba(255,240,205,0)');
+      ctx.fillStyle = gg; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.restore();
+
+    // her arms, around him
+    if (girlA > 0.003) { girlLayer(P, 'arm'); blitGirl(P, girlA); }
+
+    // the near flowers stand in front of them, lit by the same light
+    A.globalCompositeOperation = 'source-over';
+    A.globalAlpha = 1;
+    A.clearRect(0, 0, W, H);
+    A.drawImage(bgFore.c, 0, 0, W, H);
+    A.globalCompositeOperation = 'destination-in';
+    A.drawImage(light.c, 0, 0, W, H);
+    A.globalCompositeOperation = 'source-over';
+    ctx.drawImage(tmp.c, 0, 0, W, H);
+    if (dayT > 0.002) {
+      ctx.globalAlpha = dayT;
+      ctx.drawImage(bgDayFore.c, 0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
+
+    // vignette dissolves with the night
+    if (dayT < 0.999) {
+      const vg = ctx.createRadialGradient(W * 0.5, H * 0.5, Math.min(W, H) * 0.25, W * 0.5, H * 0.5, Math.hypot(W, H) * 0.62);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(1, `rgba(0,0,0,${0.72 * (1 - dayT)})`);
+      ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    }
+
+    // warm noon haze
+    if (dayT > 0.002) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.16 * dayT;
+      const sun = ctx.createRadialGradient(W * 0.72, H * 0.12, 0, W * 0.72, H * 0.12, Math.hypot(W, H) * 0.8);
+      sun.addColorStop(0, 'rgba(255,247,214,1)');
+      sun.addColorStop(1, 'rgba(255,240,200,0)');
+      ctx.fillStyle = sun; ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // your light
+    if (cursorA > 0.01) {
+      const core = ctx.createRadialGradient(lx, ly, 0, lx, ly, 26);
+      core.addColorStop(0, `rgba(255,250,236,${0.95 * cursorA})`);
+      core.addColorStop(0.25, `rgba(255,232,190,${0.45 * cursorA})`);
+      core.addColorStop(1, 'rgba(255,220,170,0)');
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = core;
+      ctx.beginPath(); ctx.arc(lx, ly, 26, 0, 6.2832); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    if (mode === 'held' && heldFor > 3.5 && !hint.classList.contains('day')) {
+      hint.textContent = 'click anywhere to go back';
+      hint.classList.add('day');
+      hint.classList.remove('gone');
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

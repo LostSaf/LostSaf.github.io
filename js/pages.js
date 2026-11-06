@@ -102,7 +102,7 @@ const ROOMS = {
     <div class="cork" ${W}>
       ${onFloor('study').map((p) => `
       <a class="icard" href="${hrefOf(p)}" data-slug="${p.slug}">
-        <small>${p.card === 'tool' ? 'ADD-ON' : `STUDY CAT ${esc(p.card.toUpperCase())}`} &nbsp;/&nbsp; ${esc(p.year)}</small>
+        <small>${p.card === 'tool' ? 'ADD-ON' : p.card === 'dental' ? 'DENTAL TRAINER' : `STUDY CAT ${esc(p.card.toUpperCase())}`} &nbsp;/&nbsp; ${esc(p.year)}</small>
         <b>${esc(p.title)}</b><span>${esc(p.short)}</span>
       </a>`).join('')}
     </div>
