@@ -426,7 +426,7 @@ document.addEventListener('keydown', unlockSound, { once: true });
   panel.querySelector('[data-sound]').setAttribute('aria-pressed', String(sound.on));
 
   const params = new URLSearchParams(location.search);
-  const seen = sessionStorage.getItem('sm-intro') === '1' && !params.has('intro');
+  const seen = params.has('skip') || (sessionStorage.getItem('sm-intro') === '1' && !params.has('intro'));
 
   if (seen) {
     document.body.classList.remove('is-intro');

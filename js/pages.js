@@ -132,12 +132,13 @@ const ROOMS = {
       <div class="atelier__stats">${fashion.stats.map(([n, t]) => `<span><b>${esc(n)}</b>${esc(t)}</span>`).join('')}</div>
       <div class="callsheet"><b>Also on the call sheet</b><ul>${fashion.more.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>
         <p style="margin:8px 0 0">Credits with ${fashion.credits.map(esc).join(', ')}.</p></div>
+      <div class="fitting"><b>Fitting room</b>
       <div class="mirror" title="Fitting room"><canvas data-mirror width="36" height="36" aria-label="Little Me, wearing the outfit you pick"></canvas></div>
       <div class="swatches" role="group" aria-label="Dress little Me">
         ${[['top', 'blue', '#2b44e0'], ['top', 'pink', '#ff4d9a'], ['top', 'yolk', '#ffc414'], ['top', 'moss', '#3a9d4f'], ['top', 'varsity', '#24202c'], ['top', 'knit', '#efe7d4'],
           ['hat', 'cap', '#ff5b2e'], ['hat', 'beanie', '#8e5bd6'], ['hat', 'none', '#fdfdf9'], ['eyes', 'shades', '#1d1922'], ['eyes', 'none', '#cfd8de']]
-          .map(([part, key, c]) => `<button class="swatch" type="button" data-part="${part}" data-key="${key}" aria-pressed="false" style="--c:${c}" aria-label="${part} ${key}"></button>`).join('')}
-      </div>
+          .map(([part, key, c]) => `<button class="swatch" type="button" data-part="${part}" data-key="${key}" aria-pressed="false" style="--c:${c}" aria-label="${part} ${key}" title="${part}: ${key}"></button>`).join('')}
+      </div></div>
     </div>`,
 
   workshop: () => `
@@ -207,7 +208,7 @@ export function projectHTML(p) {
   </div>
   <header class="phero" data-floor="${p.floor}">
     <div class="phero__in">
-      <h1 class="ptitle">${esc(p.title)}</h1>
+      <h1 class="ptitle${p.title.length > 34 ? ' is-xlong' : ''}" style="--L:${Math.max(6, ...p.title.split(/\s+/).map((w) => w.length))}">${esc(p.title)}</h1>
       <div>
         <p class="pmeta">${esc(p.year)} &nbsp;/&nbsp; ${esc(p.role)}</p>
         <p class="plede">${esc(p.lede)}</p>

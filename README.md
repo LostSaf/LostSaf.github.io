@@ -1,5 +1,7 @@
 # Safowan Mostaque, portfolio
 
+Live at **https://lostsaf.github.io/** (add `?skip` to a link to open straight into the building).
+
 The portfolio is a building. It starts as a black lacquer screen; click and it shatters into pixels, little Me hoovers them up as ink, builds the roof sign out of them, raises the tower, and rides the elevator down, building each floor as you reach it.
 
 | Floor | What is in it |
@@ -60,4 +62,4 @@ media/              real footage, photos, the add-ons' own files
 
 ## Put it online
 
-Any static host. GitHub Pages: push this repo and turn on Pages for `main`.
+It is served by GitHub Pages from the `main` branch of `LostSaf/LostSaf.github.io`. Push to `main` and the site updates within a minute or two.
