@@ -124,7 +124,7 @@ const ROOMS = {
     <div class="gallery">
       ${fashion.productions.map((x) => `
       <button class="frame" type="button" data-prod="${x.slug}" ${W}>
-        <span class="frame__gilt"><img src="media/fashion/${esc(x.photos[0])}" alt="${esc(x.title)}, ${esc(x.org)}" loading="lazy"></span>
+        <span class="frame__gilt"><img src="media/fashion/${esc(x.photos[0])}" alt="${esc(x.title)}, ${esc(x.org)}" loading="lazy"><i class="frame__count">${x.photos.length} photos</i></span>
         <span class="frame__plate"><b>${esc(x.title)}</b><span>${esc(x.org)}</span></span>
       </button>`).join('')}
     </div>

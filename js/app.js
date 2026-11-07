@@ -148,9 +148,13 @@ function setPanel(id) {
   panel.querySelector('.panel__screen').textContent = id === 'roof' ? 'R' : f ? f.no : '';
 }
 
+// A shoot opens as the whole roll: one photo at a time on a snapping track, the film strip under it.
+// Photos load as you get near them, so a 30 photo shoot costs three photos to open.
 let lb = null;
+let shoot = null; // the open shoot: { go, step, at, opener, off }
 function openShoot(slug) {
   const x = fashion.productions.find((p) => p.slug === slug);
+  if (!x) return;
   if (!lb) {
     lb = document.createElement('div');
     lb.className = 'lb';
@@ -158,20 +162,134 @@ function openShoot(slug) {
     lb.setAttribute('aria-modal', 'true');
     document.body.appendChild(lb);
     lb.addEventListener('click', (e) => { if (e.target === lb || e.target.closest('[data-close]')) closeShoot(); });
-    addEventListener('keydown', (e) => { if (e.key === 'Escape' && lb.classList.contains('is-open')) closeShoot(); });
+    addEventListener('keydown', (e) => {
+      if (!shoot) return;
+      if (e.key === 'Escape') closeShoot();
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); shoot.step(1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); shoot.step(-1); }
+      else if (e.key === 'Home') { e.preventDefault(); shoot.go(0); }
+      else if (e.key === 'End') { e.preventDefault(); shoot.go(Infinity); }
+    });
   }
+  shoot?.off();
+  const n = x.photos.length;
+  const two = (i) => String(i).padStart(2, '0');
+  lb.setAttribute('aria-label', `${x.title}, ${n} photos`);
   lb.innerHTML = `
-    <div class="lb__photos">${x.photos.map((ph) => `<img src="media/fashion/${esc(ph)}" alt="${esc(x.title)}">`).join('')}</div>
-    <div class="lb__text"><small>${esc(x.org)}</small><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p>
+    <div class="lb__stage">
+      <div class="lb__track" aria-roledescription="carousel" aria-label="${esc(x.title)} photos">
+        ${x.photos.map((ph, i) => `<figure class="lb__slide" aria-roledescription="slide" aria-label="${i + 1} of ${n}"><img data-src="media/fashion/${esc(ph)}" alt="${esc(x.title)}, photo ${i + 1} of ${n}" decoding="async"></figure>`).join('')}
+      </div>
+      <button class="lb__nav lb__nav--prev" type="button" data-step="-1" aria-label="Previous photo">&lt;</button>
+      <button class="lb__nav lb__nav--next" type="button" data-step="1" aria-label="Next photo">&gt;</button>
+    </div>
+    <div class="lb__strip" role="group" aria-label="Every photo in ${esc(x.title)}">
+      ${x.photos.map((ph, i) => `<button class="lb__thumb" type="button" data-i="${i}" aria-label="Photo ${i + 1}"><img src="media/fashion/thumbs/${esc(ph)}" alt="" loading="lazy"></button>`).join('')}
+    </div>
+    <div class="lb__text"><small>${esc(x.org)}</small><h3 style="--L:${Math.max(...x.title.split(' ').map((w) => w.length))}">${esc(x.title)}</h3>
+      <p class="lb__count" aria-live="polite"><b>01</b> / ${two(n)}</p>
+      <p>${esc(x.desc)}</p>
       <div class="lb__roles">${x.roles.map((r) => `<span>${esc(r)}</span>`).join('')}</div>
-      <p style="margin-top:18px;font-size:14px">Wardrobe sourced and styled by me.${fashion.url ? ` <a href="${esc(fashion.url)}" target="_blank" rel="noopener">The full styling portfolio</a>.` : ''}</p></div>
+      <p style="margin-top:18px;font-size:14px">Wardrobe sourced and styled by me.${fashion.url ? ` <a href="${esc(fashion.url)}" target="_blank" rel="noopener">The full styling portfolio</a>.` : ''}</p>
+      <p class="lb__hint">Scroll, swipe or use the arrow keys. Pick any frame on the strip.</p></div>
     <button class="key lb__close" type="button" data-close>Close</button>`;
+
+  const track = lb.querySelector('.lb__track');
+  const strip = lb.querySelector('.lb__strip');
+  const imgs = [...track.querySelectorAll('img')];
+  const thumbs = [...strip.querySelectorAll('.lb__thumb')];
+  const count = lb.querySelector('.lb__count b');
+  const [prev, next] = lb.querySelectorAll('.lb__nav');
+  let at = -1;
+
+  const load = (i) => { const im = imgs[i]; if (im && !im.src) im.src = im.dataset.src; };
+  const show = (i) => {
+    if (i === at) return;
+    if (at >= 0) thumbs[at].setAttribute('aria-current', 'false');
+    at = i;
+    count.textContent = two(i + 1);
+    prev.disabled = i === 0;
+    next.disabled = i === n - 1;
+    const t = thumbs[i];
+    t.setAttribute('aria-current', 'true');
+    const s = strip.getBoundingClientRect(), r = t.getBoundingClientRect();
+    glide(strip.scrollLeft + r.left - s.left - (s.width - r.width) / 2);
+  };
+  // the strip eases itself along: Chrome drops one smooth scroll when another starts on the track
+  let glideTo = 0, gliding = 0;
+  const glide = (to) => {
+    glideTo = Math.max(0, Math.min(strip.scrollWidth - strip.clientWidth, to));
+    if (reduced) { strip.scrollLeft = glideTo; return; }
+    if (gliding) return;
+    const tick = () => {
+      const d = glideTo - strip.scrollLeft;
+      if (Math.abs(d) < 1 || !shoot) { strip.scrollLeft = glideTo; gliding = 0; return; }
+      strip.scrollLeft += d * 0.2;
+      gliding = requestAnimationFrame(tick);
+    };
+    gliding = requestAnimationFrame(tick);
+  };
+  // photos load around where the track comes to rest, so a long jump skips everything it flies past
+  const near = (i) => { for (let k = i - 1; k <= i + 2; k++) load(k); };
+  const go = (i, smooth = !reduced) => {
+    i = Math.max(0, Math.min(n - 1, i));
+    near(i);
+    track.scrollTo({ left: i * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+    show(i);
+  };
+  // where the track is decides the photo, so swipes and trackpads count too
+  let rest = 0;
+  const onScroll = () => {
+    show(Math.max(0, Math.min(n - 1, Math.round(track.scrollLeft / Math.max(1, track.clientWidth)))));
+    clearTimeout(rest);
+    rest = setTimeout(() => near(at), 140);
+  };
+  track.addEventListener('scroll', onScroll, { passive: true });
+
+  // a mouse wheel moves one photo per notch; sideways trackpad scrolling is left to the browser
+  let acc = 0, lock = 0;
+  const wheel = (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    const now = performance.now();
+    if (now < lock) return;
+    acc += e.deltaY;
+    if (Math.abs(acc) >= 40) { go(at + Math.sign(acc)); acc = 0; lock = now + 420; }
+  };
+  track.addEventListener('wheel', wheel, { passive: false });
+  // the strip scrolls sideways under a plain wheel
+  strip.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    strip.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  lb.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => go(at + Number(b.dataset.step))));
+  thumbs.forEach((t) => t.addEventListener('click', () => go(Number(t.dataset.i))));
+  // keep the same photo in view when the window changes size
+  const ro = new ResizeObserver(() => { if (at >= 0) track.scrollTo({ left: at * track.clientWidth }); });
+  ro.observe(track);
+
+  shoot = {
+    go, step: (d) => go(at + d), opener: document.activeElement,
+    off: () => { ro.disconnect(); track.removeEventListener('scroll', onScroll); },
+  };
   lb.classList.add('is-open');
   document.documentElement.style.overflow = 'hidden';
+  near(0);
+  show(0);
   lb.querySelector('[data-close]').focus();
   sfx.blip();
 }
-function closeShoot() { lb.classList.remove('is-open'); document.documentElement.style.overflow = ''; }
+function closeShoot() {
+  if (!shoot) return;
+  const back = shoot.opener;
+  shoot.off();
+  shoot = null;
+  lb.classList.remove('is-open');
+  document.documentElement.style.overflow = '';
+  if (back && back.isConnected) back.focus({ preventScroll: true });
+}
 
 function mountDial(dial) {
   const orb = dial.querySelector('.dial__orb');

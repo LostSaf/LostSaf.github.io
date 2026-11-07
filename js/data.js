@@ -542,39 +542,38 @@ export const earlier = [
 // Older and smaller things, kept on a shelf in the mailroom.
 export const archive = [
   { title: 'LoL Winning Analysis', text: 'What wins League of Legends games, analysed in R.', year: '2023', href: 'https://github.com/LostSaf/LOL---Winning-Analysis' },
-  { title: 'Word Problem Game', text: 'A word problem game in Python.', year: '2024', href: 'https://github.com/LostSaf/WordProblemGame' },
-  { title: 'Fashion Portfolio', text: 'The styling portfolio, as its own site.', year: '2026', href: 'https://github.com/LostSaf/Fashion-Portfolio' },
 ];
 
-// Fashion, from the styling portfolio.
+// Fashion, from the styling portfolio. Every photo of every shoot, in the portfolio's order.
+const shots = (slug, n) => Array.from({ length: n }, (_, i) => `${slug}-${i + 1}.jpg`);
 export const fashion = {
   url: '', // link to the full styling portfolio once it is online
   credits: ['MUSE Magazine', 'Project Red', 'QFIN', 'QFSF', 'VCFS'],
   productions: [
     { slug: 'perpendicular-dance', title: 'Perpendicular Dance', org: 'Personal', roles: ['Creative Director', 'Stylist', 'Logistics'],
       desc: 'A personal direction on fast burning love: two bodies, fleeting intimacy, traced in laser light and smoke. Concept, casting, set logistics and the full wardrobe sourced and styled by me.',
-      photos: ['perpendicular-dance-1.jpg', 'perpendicular-dance-4.jpg', 'perpendicular-dance-9.jpg'] },
+      photos: shots('perpendicular-dance', 30) },
     { slug: 'china', title: 'China', org: 'MUSE Magazine, Cultural Edition', roles: ['Stylist', 'Creative Assistant'],
       desc: "Styling and creative support for the China chapter of MUSE's Cultural Edition, translating its dress traditions and visual codes into wardrobe and editorial images.",
-      photos: ['china-1.jpg', 'china-5.jpg'] },
+      photos: shots('china', 19) },
     { slug: 'india', title: 'India', org: 'MUSE Magazine, Cultural Edition', roles: ['Stylist', 'Creative Assistant'],
       desc: "Wardrobe and visual direction drawing on the subcontinent's textile heritage: bandhani, mirror work, sharara and gold laced silks.",
-      photos: ['india-1.jpg', 'india-6.jpg'] },
+      photos: shots('india', 16) },
     { slug: 'in-exile', title: 'In Exile', org: 'Project Red, photoshoot', roles: ['Creative Director', 'Stylist'],
       desc: 'The Hermit. A directed photoshoot on belonging on your own terms: not fitting in, yet wholly at home in your own style. Concept and full wardrobe by me.',
-      photos: ['in-exile-1.jpg', 'in-exile-3.jpg'] },
+      photos: shots('in-exile', 10) },
     { slug: 'iran', title: 'Iran', org: 'MUSE Magazine, Cultural Edition', roles: ['Stylist', 'Creative Assistant'],
       desc: 'Wardrobe and visual direction grounded in Persian heritage, weaving traditional symbols, textiles and craft objects into the editorial.',
-      photos: ['iran-1.jpg'] },
+      photos: shots('iran', 8) },
     { slug: 'moth-to-a-flame', title: 'Moth to a Flame', org: 'VCFS', roles: ['Model', 'Accessory Stylist'],
       desc: 'The pull of seductive, dangerous beauty in deep red and noir. Modelled the look and led the accessory direction.',
-      photos: ['moth-to-a-flame-1.jpg', 'moth-to-a-flame-4.jpg'] },
+      photos: shots('moth-to-a-flame', 11) },
     { slug: 'luna', title: 'Luna', org: 'QFIN', roles: ['Stylist', 'Creative Assistant'],
       desc: "Conceived around Smashing Pumpkins' Luna: moonlit, violet blue intimacy in bedroom light and rhinestone pinned skin.",
-      photos: ['luna-1.jpg'] },
+      photos: shots('luna', 7) },
     { slug: 'spooky', title: 'Spooky', org: 'QFSF', roles: ['Stylist', 'Creative Assistant', 'Model Co-Head'],
       desc: 'A witchy, autumnal editorial built on candlelight, masks and forest edge melancholy. Styled the looks and co-led the modelling team.',
-      photos: ['spooky-1.jpg'] },
+      photos: shots('spooky', 7) },
   ],
   more: ['Garden Club, MUSE Magazine', 'In Exile runway, Project Red', 'Second Skin, QFIN', 'A New Dawn, VCFS', 'Rearview, VCFS'],
   stats: [['14', 'productions'], ['5', 'organisations'], ['100%', 'wardrobe sourced by me']],
