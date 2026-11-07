@@ -5,6 +5,7 @@
 
 import { me, show, hop, walk, say, fire, assemble, scatterDust, vacuum, wait, reduced, SCALE, home } from './stage.js';
 import { buildIn, buildNow, namePoints } from './print.js';
+import { floors as floorData } from './data.js';
 import { sfx } from './sfx.js';
 
 let skipped = false, showing = false, io = null, running = false;
@@ -15,16 +16,121 @@ skipBtn.addEventListener('click', () => skipShow());
 const rectOf = (el) => () => el.getBoundingClientRect();
 const $ = (s) => document.querySelector(`#view ${s}`);
 
-// standing in the elevator car, or in the corner on small screens
-export function carAnchor() {
-  return {
-    fn: () => {
-      const box = $('.car__box');
-      const r = box && box.getBoundingClientRect();
-      if (!r || !r.width) return home();
-      return { x: r.left + r.width / 2, y: r.bottom - 12 };
-    },
+// standing in the elevator car, or in the corner on small screens. One anchor
+// object, so `me.anchor === CAR` says he is riding.
+const CAR = {
+  fn: () => {
+    const box = $('.car__box');
+    const r = box && box.getBoundingClientRect();
+    if (!r || !r.width) return home();
+    return { x: r.left + r.width / 2, y: r.bottom - 12 };
+  },
+};
+export const carAnchor = () => CAR;
+
+// ------------------------------------------------------------------- the lift
+// The car follows whichever floor you are looking at, and little Me only ever
+// changes floors inside it. While he is out on a floor working, the car waits
+// for him there; when he is done he walks back to the doors, gets in, and the
+// car carries him to wherever you have scrolled.
+const lift = { car: null, floors: [], at: null, want: null, hold: 0, gen: 0, trip: 0 };
+let out = null; // the floor he is standing on when he is not in the car
+
+const hasCar = () => !!(lift.car && lift.car.isConnected && lift.car.offsetWidth);
+
+function moveCar(id) {
+  const { car, floors } = lift;
+  const f = floors.find((x) => x.id === id);
+  if (!car || !car.isConnected || (!f && id !== 'roof')) return Promise.resolve();
+  const top = id === 'roof' ? 0 : f.offsetTop + f.offsetHeight - 16 - car.offsetHeight;
+  const from = parseFloat(car.style.top);
+  const trip = ++lift.trip;
+  lift.at = id;
+  car.style.top = `${top}px`;
+  const cable = car.querySelector('.car__cable');
+  cable.style.top = `${-top}px`;
+  cable.style.height = `${top + 24}px`;
+  car.querySelector('.car__lamp').textContent = id === 'roof' ? 'R' : floorData.find((x) => x.id === id).no;
+  const travels = !Number.isNaN(from) && Math.abs(from - top) > 1 && !reduced && hasCar();
+  if (travels) floors.forEach((x) => x.classList.remove('is-here')); // doors shut while it moves
+  const open = () => {
+    if (trip !== lift.trip) return; // sent somewhere else on the way
+    floors.forEach((x) => x.classList.toggle('is-here', x.id === id));
+    if (travels) sfx.ding();
   };
+  if (!travels) { open(); return Promise.resolve(); }
+  return wait(0.95).then(open);
+}
+// with nobody holding it, the car goes to the floor you are looking at
+function follow() {
+  if (!lift.hold && lift.want && lift.want !== lift.at) moveCar(lift.want);
+}
+
+export function mountLift(root, onView) {
+  lift.car = root.querySelector('.car');
+  lift.floors = [...root.querySelectorAll('.floor')];
+  lift.at = null; lift.want = null; lift.hold = 0; lift.gen++;
+  out = null;
+  const roofEl = root.querySelector('.roof');
+  const settle = () => {
+    const mid = innerHeight * 0.55;
+    let pick = null;
+    for (const f of lift.floors) { const r = f.getBoundingClientRect(); if (r.top <= mid && r.bottom >= mid) { pick = f; break; } }
+    const onRoof = !pick && roofEl.getBoundingClientRect().bottom > mid * 0.6;
+    const key = pick ? pick.id : onRoof ? 'roof' : lift.want;
+    if (key && key !== lift.want) { lift.want = key; onView(key); }
+    follow();
+  };
+  const onScroll = () => requestAnimationFrame(settle);
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  settle();
+  return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll); lift.car = null; lift.floors = []; };
+}
+
+// keep the car for the length of a job, then let it follow you again
+async function holding(job) {
+  const gen = lift.gen;
+  lift.hold++;
+  try { return await job(); } finally { if (gen === lift.gen) { lift.hold--; follow(); } }
+}
+
+// the spot just inside the lift doors on a floor
+const doorAt = (floor) => groundAt(floor, () => floor.querySelector('.floor__ground').getBoundingClientRect().right - 30);
+
+// back into the car: call it to his floor, walk to the doors, step in
+async function board() {
+  if (me.anchor === CAR) return;
+  const f = out;
+  out = null;
+  if (f && f.isConnected && visible(f)) {
+    await moveCar(f.id);
+    await walk(doorAt(f), 340);
+    await hop(CAR, { height: 46 });
+  } else if (f) {
+    // nobody can see that floor, so no need to make him walk it
+    me.anchor = CAR;
+  } else {
+    await hop(CAR, { height: 80 });
+  }
+}
+// ride to a floor and step out onto it
+async function alight(floor) {
+  await board();
+  await moveCar(floor.id);
+  if (!floor.isConnected) return false;
+  await hop(doorAt(floor), { height: 46 });
+  out = floor;
+  return true;
+}
+
+// clicking a project: if it is on another floor he rides there first, then walks over
+export function goToThing(el, target) {
+  const floor = el.closest('.floor');
+  return holding(async () => {
+    if (floor && hasCar() && (me.anchor === CAR ? lift.at !== floor.id : out !== floor)) await alight(floor);
+    await hop(target, { dur: 0.45, height: 70 });
+  });
 }
 // a point on a floor's ground, x in page pixels
 const groundAt = (floor, x) => ({
@@ -171,30 +277,30 @@ async function runQueue() {
     const floor = queue.shift();
     if (!floor.isConnected) continue;
     if (reduced || !visible(floor)) { floor.querySelectorAll('[data-s="wait"]').forEach(buildNow); continue; }
-    await buildFloor(floor);
+    await holding(() => buildFloor(floor));
   }
   running = false;
-  if (!me.moving) hop(carAnchor(), { height: 80 });
 }
 
 async function buildFloor(floor) {
   const items = [...floor.querySelectorAll('[data-s="wait"]')];
+  const finish = () => items.forEach(buildNow);
+  // ride the lift to this floor and step out of the doors
+  if (!(await alight(floor)) || !visible(floor)) { finish(); return board(); }
   const head = items.shift();
-  const ground = floor.querySelector('.floor__ground').getBoundingClientRect();
-  // step out of the lift onto this floor
-  await hop(groundAt(floor, () => floor.querySelector('.floor__ground').getBoundingClientRect().right - 30), { height: 70 });
   if (head) {
     me.aimTarget = () => { const r = head.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
     await Promise.all([fire(rectOf(head), 0.3), buildIn(head, { dur: 0.45 })]);
   }
   // then the room, right to left, a few things at a time
   items.sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
-  void ground;
   while (items.length) {
-    if (!visible(floor)) { items.forEach(buildNow); break; }
+    if (!floor.isConnected) { me.aimTarget = null; return; }
+    if (!visible(floor)) { finish(); break; }
     const batch = items.splice(0, 3);
     const lead = batch[0];
     await walk(groundAt(floor, () => { const r = lead.getBoundingClientRect(); return r.left + r.width + 24; }), 340);
+    if (!floor.isConnected) { me.aimTarget = null; return; }
     const union = () => {
       const rs = batch.map((el) => el.getBoundingClientRect());
       const l = Math.min(...rs.map((r) => r.left)), t = Math.min(...rs.map((r) => r.top));
@@ -204,4 +310,6 @@ async function buildFloor(floor) {
     await Promise.all([fire(union, 0.3 + batch.length * 0.12), ...batch.map((el, i) => buildIn(el, { dur: 0.6, delay: i * 0.12 }))]);
   }
   me.aimTarget = null;
+  // done: back to the doors and into the car
+  if (floor.isConnected) await board();
 }

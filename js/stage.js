@@ -105,8 +105,14 @@ export function show(at) {
   me.x = p.x; me.y = p.y; me.visible = true;
 }
 
+// A page change cuts off whatever he was doing: hops and walks already under way
+// stop steering him, so a job left over from the last page cannot drag him around.
+let epoch = 0;
+export function interrupt() { epoch++; me.anchor = null; me.aimTarget = null; me.moving = 0; }
+
 export async function hop(target, o = {}) {
   me.moving++;
+  const ep = epoch;
   const a = { x: me.x, y: me.y };
   const b0 = resolve(target);
   const dist = Math.hypot(b0.x - a.x, b0.y - a.y);
@@ -118,12 +124,14 @@ export async function hop(target, o = {}) {
   me.look = -0.2;
   sfx.jump();
   await tween(dur, (t) => {
+    if (ep !== epoch) return;
     const b = resolve(target);
     const e = ease.sine(t);
     me.x = a.x + (b.x - a.x) * e;
     me.y = a.y + (b.y - a.y) * e - height * 4 * t * (1 - t);
     me.pose = 'jump';
   });
+  if (ep !== epoch) return; // interrupt() already reset the count
   me.anchor = target;
   me.pose = 'idle';
   me.flame = false;
@@ -135,12 +143,14 @@ export async function hop(target, o = {}) {
 
 export async function walk(target, speed = 120) {
   me.moving++;
+  const ep = epoch;
   const a = me.x;
   const b0 = resolve(target);
   const dist = Math.abs(b0.x - a);
   me.anchor = null;
   faceToward(b0.x);
   await tween(dist / speed, (t) => {
+    if (ep !== epoch) return;
     const b = resolve(target);
     me.x = a + (b.x - a) * t;
     me.y = b.y;
@@ -149,6 +159,7 @@ export async function walk(target, speed = 120) {
     if (st !== me.step && st % 2 === 0) sfx.step();
     me.step = st;
   });
+  if (ep !== epoch) return; // interrupt() already reset the count
   me.anchor = target;
   me.pose = 'idle';
   me.moving--;

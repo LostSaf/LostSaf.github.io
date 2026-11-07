@@ -8,8 +8,8 @@
 import { runIntro } from './intro.js';
 import { homeHTML, projectHTML, cvHTML, panelHTML, bySlug, esc } from './pages.js';
 import { floors, fashion } from './data.js';
-import { landingShow, watchFloors, stopWatching, buildAll, carAnchor } from './director.js';
-import { me, show, hop, say, tween, setRoller, reduced, SCALE, ease } from './stage.js';
+import { landingShow, watchFloors, stopWatching, buildAll, carAnchor, mountLift, goToThing } from './director.js';
+import { me, show, hop, say, tween, setRoller, interrupt, reduced, SCALE, ease } from './stage.js';
 import { setOutfit, outfit, compose, onOutfit } from './sprite.js';
 import { sfx, unlockSound, sound } from './sfx.js';
 
@@ -48,39 +48,9 @@ function mountHome(root) {
   root.querySelectorAll('video[data-src]').forEach((v) => vio.observe(v));
   offs.push(() => vio.disconnect());
 
-  // the elevator follows whichever floor you are looking at
-  const tower = root.querySelector('.tower');
-  const car = root.querySelector('.car');
-  const lamp = root.querySelector('.car__lamp');
-  const cable = root.querySelector('.car__cable');
-  const floorsEls = [...root.querySelectorAll('.floor')];
-  let here = null;
-  const settle = () => {
-    const mid = innerHeight * 0.55;
-    let pick = null;
-    for (const f of floorsEls) { const r = f.getBoundingClientRect(); if (r.top <= mid && r.bottom >= mid) { pick = f; break; } }
-    const roofEl = root.querySelector('.roof');
-    const onRoof = !pick && roofEl.getBoundingClientRect().bottom > mid * 0.6;
-    const key = pick ? pick.id : onRoof ? 'roof' : here;
-    if (key && key !== here) {
-      here = key;
-      floorsEls.forEach((f) => f.classList.toggle('is-here', f.id === here));
-      const f = floorsEls.find((x) => x.id === here) || floorsEls[0];
-      const top = here === 'roof' ? 0 : f.offsetTop + f.offsetHeight - 16 - car.offsetHeight;
-      car.style.top = `${top}px`;
-      cable.style.top = `${-top}px`;
-      cable.style.height = `${top + 24}px`;
-      lamp.textContent = here === 'roof' ? 'R' : floors.find((x) => x.id === here).no;
-      setPanel(here);
-      if (built) setTimeout(() => sfx.ding(), reduced ? 0 : 850);
-    }
-  };
-  const onScroll = () => requestAnimationFrame(settle);
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', onScroll);
-  settle();
-  offs.push(() => { removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll); });
-  void tower;
+  // the elevator: the panel shows the floor you are looking at, and the car
+  // follows it, unless little Me is out on a floor and has it waiting for him
+  offs.push(mountLift(root, setPanel));
 
   // workshop tags light up everything that used them
   const tape = root.querySelector('.tape');
@@ -409,7 +379,8 @@ function roll(dir, color, onX) {
   const r = { x: dir > 0 ? -40 : W + 40, dir, color };
   const x0 = r.x, x1 = dir > 0 ? W + 40 + 26 * S : -40 - 26 * S;
   setRoller(r);
-  me.visible = true; me.anchor = null; me.aimTarget = null; me.bubble = null;
+  interrupt();
+  me.visible = true; me.bubble = null;
   me.moving++;
   sfx.whoosh();
   return tween(reduced ? 0 : 1.2, (t) => {
@@ -528,8 +499,8 @@ document.addEventListener('click', (e) => {
   if (obj && current.route.name === 'home' && !me.moving && !reduced && me.visible) {
     e.preventDefault();
     sfx.blip();
-    const r = obj.getBoundingClientRect();
-    hop({ x: r.left + r.width / 2, y: Math.min(r.bottom, innerHeight - 20) }, { dur: 0.45, height: 70 })
+    // aim at the thing itself, so the spot moves with it while he rides there
+    goToThing(obj, { el: obj, ax: 0.5, ay: 1 })
       .then(() => { location.hash = obj.getAttribute('href'); });
   }
 });

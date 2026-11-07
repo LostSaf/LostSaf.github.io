@@ -323,9 +323,10 @@ body.is-intro .panel { display: none; }
   overflow: hidden;
 }
 .floor::after {
-  /* the light in the room follows the time of day */
-  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: rgb(12 10 40 / calc(var(--night) * .5));
+  /* the light in the room follows the time of day: after dark the walls and floor
+     dim, but everything in the room stays lit, so the work keeps its colour */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: rgb(12 10 40 / calc(var(--night) * .4));
   mix-blend-mode: multiply;
 }
 .floor__ground { position: absolute; left: 0; right: var(--shaft); bottom: 0; height: var(--ground); background: var(--floorc); border-top: 3px solid var(--ink); z-index: 1; }
@@ -350,7 +351,7 @@ body.is-intro .panel { display: none; }
   box-shadow: 0 4px 0 var(--ink);
 }
 .floor__name { margin: 0; font: 400 clamp(40px, 5vw, 64px)/.9 var(--f-sign); letter-spacing: .02em; text-transform: uppercase; color: var(--accent); text-shadow: 0 3px 0 var(--ink); }
-.floor__blurb { margin: 0; font: 400 15px/1.4 var(--f-mono); max-width: 46ch; padding: 3px 8px; background: var(--wall); box-shadow: 0 0 0 3px var(--wall); }
+.floor__blurb { --chip: color-mix(in srgb, var(--wall), #0c0a28 calc(var(--night) * 36%)); margin: 0; font: 400 15px/1.4 var(--f-mono); max-width: 46ch; padding: 3px 8px; background: var(--chip); box-shadow: 0 0 0 3px var(--chip); }
 .room {
   position: relative; z-index: 2;
   display: flex; flex-wrap: wrap; align-items: flex-end; gap: 30px clamp(20px, 3vw, 44px);
