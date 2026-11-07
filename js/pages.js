@@ -180,7 +180,7 @@ export function homeHTML() {
   </div>
   <div class="street" aria-hidden="true" ${W}></div>
   <footer class="cornerstone" ${W}>
-    <div class="cornerstone__stone">LAID<br>${new Date().getFullYear()}</div>
+    <div class="cornerstone__stone">EST.<br>2026</div>
     <ol>
       <li><b>The black screen</b> is the wave equation stepped every frame and shaded in WebGL2 as lacquer, with a glint that follows your cursor.</li>
       <li><b>The shatter</b> freezes that frame into a texture and breaks it into a quadtree of instanced shards, smaller the closer they were to your click.</li>
