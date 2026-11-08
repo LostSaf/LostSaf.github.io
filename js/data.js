@@ -576,7 +576,7 @@ export const fashion = {
       photos: shots('spooky', 7) },
   ],
   more: ['Garden Club, MUSE Magazine', 'In Exile runway, Project Red', 'Second Skin, QFIN', 'A New Dawn, VCFS', 'Rearview, VCFS'],
-  stats: [['14', 'productions'], ['5', 'organisations'], ['100%', 'wardrobe sourced by me']],
+  stats: [['13', 'productions'], ['5', 'organisations'], ['100%', 'wardrobe sourced by me']],
 };
 
 // Every skill points at where it was used.
